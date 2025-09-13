@@ -1,0 +1,198 @@
+import React, { useEffect, useState } from 'react';
+import { Box, Grid, Typography, Checkbox, FormControlLabel, IconButton } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+import { DrokexButton, DrokexCard, DrokexCardContent, DrokexInput } from '../components/common';
+import { catalogApi, productsApi, imagesApi } from '../services/api';
+import { Category, Product, ProductImage } from '../types';
+import { drokexColors } from '../theme/drokexTheme';
+import { Delete, Star, StarBorder } from '@mui/icons-material';
+
+const ProductForm: React.FC = () => {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
+  const navigate = useNavigate();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [k: string]: string }>({});
+  const [form, setForm] = useState({
+    name: '',
+    description: '',
+    price: 0,
+    stock: 0,
+    categoryId: undefined as number | undefined,
+    isFeatured: false,
+    isActive: true,
+  });
+  const [images, setImages] = useState<ProductImage[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadCats = async () => {
+      try { const { data } = await catalogApi.getCategories(); if (!cancelled && data.data) setCategories(data.data); } catch {}
+    };
+    loadCats();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadProduct = async () => {
+      if (!isEdit || !id) return;
+      try {
+        const { data } = await productsApi.getProduct(parseInt(id, 10));
+        const p: Product | undefined = data.data as any;
+        if (!cancelled && p) {
+          setForm({
+            name: p.name,
+            description: p.description,
+            price: p.price ?? 0,
+            stock: p.stock ?? 0,
+            categoryId: undefined,
+            isFeatured: p.isFeatured,
+            isActive: p.isActive,
+          });
+          setImages(p.images || []);
+        }
+      } catch {}
+    };
+    loadProduct();
+    return () => { cancelled = true; };
+  }, [id, isEdit]);
+
+  const updateField = (k: string, v: any) => setForm(prev => ({ ...prev, [k]: v }));
+
+  const validate = () => {
+    const e: any = {};
+    if (!form.name.trim()) e.name = 'Nombre requerido';
+    if (!form.description.trim()) e.description = 'Descripción requerida';
+    if (form.price < 0) e.price = 'Precio inválido';
+    if (form.stock < 0) e.stock = 'Stock inválido';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    setLoading(true);
+    try {
+      if (isEdit && id) {
+        await productsApi.updateProduct(parseInt(id, 10), {
+          name: form.name,
+          description: form.description,
+          price: form.price,
+          stock: form.stock,
+          categoryId: form.categoryId,
+          isFeatured: form.isFeatured,
+          isActive: form.isActive,
+        } as any);
+      } else {
+        await productsApi.createProduct({
+          name: form.name,
+          description: form.description,
+          price: form.price,
+          stock: form.stock,
+          categoryId: form.categoryId,
+          isFeatured: form.isFeatured,
+        });
+      }
+      navigate('/products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isEdit || !id) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { data } = await imagesApi.upload(file);
+      const url = (data as any).data as string;
+      const first = images.length === 0;
+      const { data: upd } = await productsApi.addImage(parseInt(id, 10), {
+        imageUrl: url,
+        isPrimary: first,
+        displayOrder: images.length
+      });
+      if (upd.data?.images) setImages(upd.data.images);
+    } catch {}
+    finally {
+      // reset input to allow same file reselect
+      (e.target as HTMLInputElement).value = '';
+    }
+  };
+
+  const setPrimary = async (imageId: number) => {
+    if (!isEdit || !id) return;
+    const { data } = await productsApi.setPrimaryImage(parseInt(id, 10), imageId);
+    if (data.data?.images) setImages(data.data.images);
+  };
+
+  const deleteImage = async (imageId: number) => {
+    if (!isEdit || !id) return;
+    const { data } = await productsApi.deleteImage(parseInt(id, 10), imageId);
+    if (data.data?.images) setImages(data.data.images);
+  };
+
+  return (
+    <DrokexCard variant="elevated">
+      <DrokexCardContent>
+        <Typography variant="h6" sx={{ color: drokexColors.dark, fontWeight: 600, mb: 2 }}>
+          {isEdit ? 'Editar Producto' : 'Nuevo Producto'}
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <DrokexInput label="Nombre" value={form.name} onChange={(e) => updateField('name', e.target.value)} error={!!errors.name} helperText={errors.name} />
+          </Grid>
+          <Grid item xs={12}>
+            <DrokexInput label="Descripción" multiline rows={4} value={form.description} onChange={(e) => updateField('description', e.target.value)} error={!!errors.description} helperText={errors.description} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <DrokexInput label="Precio" type="number" value={form.price} onChange={(e) => updateField('price', Number(e.target.value))} error={!!errors.price} helperText={errors.price} />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <DrokexInput label="Stock" type="number" value={form.stock} onChange={(e) => updateField('stock', Number(e.target.value))} error={!!errors.stock} helperText={errors.stock} />
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel control={<Checkbox checked={form.isFeatured} onChange={(e) => updateField('isFeatured', e.target.checked)} />} label="Destacar producto" />
+          </Grid>
+          {isEdit && (
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" sx={{ color: drokexColors.dark, fontWeight: 600, mb: 1 }}>
+                Imágenes
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                {images.map(img => (
+                  <Box key={img.id} sx={{ position: 'relative', width: 120, height: 90, borderRadius: 2, overflow: 'hidden', border: '1px solid #eee' }}>
+                    <Box component="img" src={img.imageUrl} alt="img" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Box sx={{ position: 'absolute', top: 2, left: 2, display: 'flex', gap: 1 }}>
+                      <IconButton size="small" onClick={() => setPrimary(img.id)} title="Marcar como principal" sx={{ bgcolor: '#fff' }}>
+                        {img.isPrimary ? <Star sx={{ color: '#f59e0b' }} /> : <StarBorder />}
+                      </IconButton>
+                    </Box>
+                    <Box sx={{ position: 'absolute', top: 2, right: 2 }}>
+                      <IconButton size="small" onClick={() => deleteImage(img.id)} title="Eliminar" sx={{ bgcolor: '#fff' }}>
+                        <Delete />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+              <DrokexButton component="label" variant="outline">
+                Subir Imagen
+                <input type="file" accept="image/*" hidden onChange={handleFileChange} />
+              </DrokexButton>
+            </Grid>
+          )}
+        </Grid>
+
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mt: 3 }}>
+          <DrokexButton variant="ghost" onClick={() => navigate('/products')} disabled={loading}>Cancelar</DrokexButton>
+          <DrokexButton variant="primary" onClick={handleSubmit} loading={loading}>{isEdit ? 'Guardar Cambios' : 'Crear Producto'}</DrokexButton>
+        </Box>
+      </DrokexCardContent>
+    </DrokexCard>
+  );
+};
+
+export default ProductForm;

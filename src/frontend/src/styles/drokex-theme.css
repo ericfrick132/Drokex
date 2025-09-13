@@ -1,0 +1,439 @@
+/* ==========================================
+   DROKEX BRAND SYSTEM - CSS THEME
+   Colors, Typography, and Components
+   ========================================== */
+
+/* Importar fuentes Drokex */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap');
+
+/* Nota: La fuente Nagoda se carga desde src/styles/fonts/Nagoda.otf */
+@font-face {
+  font-family: 'Nagoda';
+  /* Usar ruta relativa para que CRA resuelva y empaquete el asset */
+  src: url('./fonts/Nagoda.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* VARIABLES CSS DROKEX */
+:root {
+  /* Colores Primarios Drokex */
+  --drokex-primary: #abd305;    /* Verde lima */
+  --drokex-secondary: #006d5a;  /* Verde teal */
+  --drokex-background: #fcffee; /* Crema */
+  --drokex-text: #161616;       /* Negro */
+  --drokex-accent: #d5ddb7;     /* Verde pálido */
+  
+  /* Variaciones de colores */
+  --drokex-primary-light: #c5e05a;
+  --drokex-primary-dark: #8bb004;
+  --drokex-secondary-light: #00876e;
+  --drokex-secondary-dark: #005346;
+  
+  /* Colores de sistema */
+  --drokex-success: #10b981;
+  --drokex-warning: #f59e0b;
+  --drokex-error: #ef4444;
+  --drokex-info: #3b82f6;
+  
+  /* Grises */
+  --drokex-gray-50: #f8fafc;
+  --drokex-gray-100: #f1f5f9;
+  --drokex-gray-200: #e2e8f0;
+  --drokex-gray-300: #cbd5e1;
+  --drokex-gray-400: #94a3b8;
+  --drokex-gray-500: #64748b;
+  --drokex-gray-600: #475569;
+  --drokex-gray-700: #334155;
+  --drokex-gray-800: #1e293b;
+  --drokex-gray-900: #0f172a;
+  
+  /* Tipografías */
+  --drokex-font-heading: 'Nagoda', 'Manrope', 'Helvetica', sans-serif;
+  --drokex-font-body: 'Manrope', 'Helvetica', sans-serif;
+  
+  /* Pesos de fuente */
+  --drokex-font-extralight: 200;
+  --drokex-font-light: 300;
+  --drokex-font-regular: 400;
+  --drokex-font-medium: 500;
+  --drokex-font-semibold: 600;
+  --drokex-font-bold: 700;
+  --drokex-font-extrabold: 800;
+  
+  /* Espaciado */
+  --drokex-spacing-xs: 0.25rem;
+  --drokex-spacing-sm: 0.5rem;
+  --drokex-spacing-md: 1rem;
+  --drokex-spacing-lg: 1.5rem;
+  --drokex-spacing-xl: 2rem;
+  --drokex-spacing-2xl: 3rem;
+  
+  /* Bordes */
+  --drokex-radius-sm: 4px;
+  --drokex-radius-md: 8px;
+  --drokex-radius-lg: 12px;
+  --drokex-radius-xl: 16px;
+  --drokex-radius-full: 9999px;
+  
+  /* Sombras */
+  --drokex-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --drokex-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --drokex-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --drokex-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* RESET Y BASE */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--drokex-font-body);
+  color: var(--drokex-text);
+  background-color: var(--drokex-background);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* TIPOGRAFÍA DROKEX */
+.drokex-heading {
+  font-family: var(--drokex-font-heading);
+  font-weight: var(--drokex-font-bold);
+  line-height: 1.2;
+  color: var(--drokex-text);
+}
+
+.drokex-h1 {
+  font-size: 2.5rem;
+  font-weight: var(--drokex-font-bold);
+}
+
+.drokex-h2 {
+  font-size: 2rem;
+  font-weight: var(--drokex-font-semibold);
+}
+
+.drokex-h3 {
+  font-size: 1.5rem;
+  font-weight: var(--drokex-font-semibold);
+}
+
+.drokex-h4 {
+  font-size: 1.25rem;
+  font-weight: var(--drokex-font-medium);
+}
+
+.drokex-body {
+  font-family: var(--drokex-font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.drokex-small {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* BOTONES DROKEX */
+.drokex-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--drokex-spacing-sm);
+  padding: var(--drokex-spacing-sm) var(--drokex-spacing-lg);
+  font-family: var(--drokex-font-body);
+  font-weight: var(--drokex-font-medium);
+  text-decoration: none;
+  border: none;
+  border-radius: var(--drokex-radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.drokex-btn-primary {
+  background-color: var(--drokex-primary);
+  color: var(--drokex-text);
+  box-shadow: var(--drokex-shadow-sm);
+}
+
+.drokex-btn-primary:hover {
+  background-color: var(--drokex-primary-dark);
+  box-shadow: var(--drokex-shadow-md);
+  transform: translateY(-1px);
+}
+
+.drokex-btn-secondary {
+  background-color: var(--drokex-secondary);
+  color: white;
+  box-shadow: var(--drokex-shadow-sm);
+}
+
+.drokex-btn-secondary:hover {
+  background-color: var(--drokex-secondary-dark);
+  box-shadow: var(--drokex-shadow-md);
+  transform: translateY(-1px);
+}
+
+.drokex-btn-outline {
+  background-color: transparent;
+  border: 2px solid var(--drokex-primary);
+  color: var(--drokex-primary);
+}
+
+.drokex-btn-outline:hover {
+  background-color: var(--drokex-primary);
+  color: var(--drokex-text);
+}
+
+/* TARJETAS DROKEX */
+.drokex-card {
+  background: white;
+  border-radius: var(--drokex-radius-lg);
+  box-shadow: var(--drokex-shadow-md);
+  padding: var(--drokex-spacing-lg);
+  transition: all 0.3s ease;
+  border: 1px solid var(--drokex-gray-200);
+}
+
+.drokex-card:hover {
+  box-shadow: var(--drokex-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.drokex-card-header {
+  border-bottom: 1px solid var(--drokex-gray-200);
+  padding-bottom: var(--drokex-spacing-md);
+  margin-bottom: var(--drokex-spacing-md);
+}
+
+/* PATRONES DROKEX */
+.drokex-pattern-arrow {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L45 15L30 30L15 15Z' fill='%23abd305' fill-opacity='0.1'/%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+.drokex-pattern-diamond {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L40 20L20 40L0 20Z' fill='%23006d5a' fill-opacity='0.05'/%3E%3C/svg%3E");
+  background-size: 40px 40px;
+}
+
+/* GRADIENTES DROKEX */
+.drokex-gradient-primary {
+  background: linear-gradient(135deg, var(--drokex-primary), var(--drokex-secondary));
+}
+
+.drokex-gradient-soft {
+  background: linear-gradient(135deg, var(--drokex-accent), var(--drokex-background));
+}
+
+/* NAVEGACIÓN DROKEX */
+.drokex-nav {
+  background: white;
+  border-bottom: 1px solid var(--drokex-gray-200);
+  box-shadow: var(--drokex-shadow-sm);
+  padding: var(--drokex-spacing-md) 0;
+}
+
+.drokex-nav-brand {
+  font-family: var(--drokex-font-heading);
+  font-size: 1.5rem;
+  font-weight: var(--drokex-font-bold);
+  color: var(--drokex-text);
+  text-decoration: none;
+}
+
+.drokex-nav-link {
+  font-family: var(--drokex-font-body);
+  font-weight: var(--drokex-font-medium);
+  color: var(--drokex-gray-600);
+  text-decoration: none;
+  padding: var(--drokex-spacing-sm) var(--drokex-spacing-md);
+  border-radius: var(--drokex-radius-sm);
+  transition: all 0.2s ease;
+}
+
+.drokex-nav-link:hover {
+  color: var(--drokex-primary);
+  background-color: var(--drokex-gray-50);
+}
+
+.drokex-nav-link.active {
+  color: var(--drokex-primary);
+  background-color: var(--drokex-accent);
+}
+
+/* FORMULARIOS DROKEX */
+.drokex-form-group {
+  margin-bottom: var(--drokex-spacing-md);
+}
+
+.drokex-label {
+  display: block;
+  font-family: var(--drokex-font-body);
+  font-weight: var(--drokex-font-medium);
+  color: var(--drokex-text);
+  margin-bottom: var(--drokex-spacing-xs);
+  font-size: 0.875rem;
+}
+
+.drokex-input {
+  width: 100%;
+  padding: var(--drokex-spacing-sm) var(--drokex-spacing-md);
+  font-family: var(--drokex-font-body);
+  font-size: 1rem;
+  border: 2px solid var(--drokex-gray-300);
+  border-radius: var(--drokex-radius-md);
+  background-color: white;
+  color: var(--drokex-text);
+  transition: all 0.2s ease;
+}
+
+.drokex-input:focus {
+  outline: none;
+  border-color: var(--drokex-primary);
+  box-shadow: 0 0 0 3px rgba(171, 211, 5, 0.1);
+}
+
+.drokex-input::placeholder {
+  color: var(--drokex-gray-400);
+}
+
+/* BADGES Y TAGS */
+.drokex-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--drokex-spacing-xs) var(--drokex-spacing-sm);
+  font-size: 0.75rem;
+  font-weight: var(--drokex-font-semibold);
+  border-radius: var(--drokex-radius-full);
+}
+
+.drokex-badge-primary {
+  background-color: var(--drokex-primary);
+  color: var(--drokex-text);
+}
+
+.drokex-badge-secondary {
+  background-color: var(--drokex-secondary);
+  color: white;
+}
+
+.drokex-badge-success {
+  background-color: var(--drokex-success);
+  color: white;
+}
+
+/* UTILIDADES */
+.drokex-text-primary { color: var(--drokex-primary) !important; }
+.drokex-text-secondary { color: var(--drokex-secondary) !important; }
+.drokex-text-center { text-align: center !important; }
+.drokex-text-left { text-align: left !important; }
+.drokex-text-right { text-align: right !important; }
+
+.drokex-bg-primary { background-color: var(--drokex-primary) !important; }
+.drokex-bg-secondary { background-color: var(--drokex-secondary) !important; }
+.drokex-bg-accent { background-color: var(--drokex-accent) !important; }
+
+.drokex-shadow { box-shadow: var(--drokex-shadow-md) !important; }
+.drokex-shadow-lg { box-shadow: var(--drokex-shadow-lg) !important; }
+
+.drokex-rounded { border-radius: var(--drokex-radius-md) !important; }
+.drokex-rounded-lg { border-radius: var(--drokex-radius-lg) !important; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .drokex-h1 { font-size: 2rem; }
+  .drokex-h2 { font-size: 1.75rem; }
+  .drokex-h3 { font-size: 1.25rem; }
+  
+  .drokex-btn {
+    padding: var(--drokex-spacing-sm) var(--drokex-spacing-md);
+    font-size: 0.875rem;
+  }
+  
+  .drokex-card {
+    padding: var(--drokex-spacing-md);
+  }
+}
+
+/* ANIMACIONES */
+@keyframes drokex-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drokex-scale-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.drokex-animate-fade-in {
+  animation: drokex-fade-in 0.3s ease;
+}
+
+.drokex-animate-scale-in {
+  animation: drokex-scale-in 0.3s ease;
+}
+
+/* LAYOUT HELPERS */
+.drokex-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--drokex-spacing-md);
+}
+
+.drokex-flex {
+  display: flex;
+}
+
+.drokex-flex-col {
+  flex-direction: column;
+}
+
+.drokex-items-center {
+  align-items: center;
+}
+
+.drokex-justify-center {
+  justify-content: center;
+}
+
+.drokex-justify-between {
+  justify-content: space-between;
+}
+
+.drokex-gap-2 {
+  gap: var(--drokex-spacing-sm);
+}
+
+.drokex-gap-4 {
+  gap: var(--drokex-spacing-md);
+}
+
+.drokex-w-full {
+  width: 100%;
+}
+
+.drokex-h-full {
+  height: 100%;
+}
+
+/* TEMA ESPECÍFICO POR REGIÓN */
+[data-tenant="honduras"] {
+  --drokex-accent-country: #0073e6;
+}
+
+[data-tenant="guatemala"] {
+  --drokex-accent-country: #4285f4;
+}
+
+[data-tenant="mexico"] {
+  --drokex-accent-country: #00a046;
+}

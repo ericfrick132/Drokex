@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add package:*)",
+      "Bash(dotnet ef migrations:*)",
+      "Bash(dotnet tool install:*)",
+      "Bash(export PATH=\"$PATH:/home/eric/.dotnet/tools\")",
+      "Bash(dotnet tool uninstall:*)",
+      "Bash(dotnet build)",
+      "Bash(npx create-react-app:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

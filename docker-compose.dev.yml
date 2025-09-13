@@ -1,0 +1,56 @@
+services:
+  drokex-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - EnableSwaggerInProduction=true
+    volumes:
+      - ./src/backend/Dockex.API:/app/src
+    ports:
+      - "5100:5000"
+      - "5101:5001" # HTTPS
+
+  drokex-frontend:
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:5100
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    ports:
+      - "3100:3000"
+
+# Servicios adicionales para desarrollo
+  drokex-docs:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docs:/usr/share/nginx/html
+    networks:
+      - drokex-network
+
+  # Base de datos local para desarrollo (opcional)
+  drokex-postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: drokexdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eric1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - drokex-postgres-data:/var/lib/postgresql/data
+    networks:
+      - drokex-network
+
+  # Adminer para gestión de BD
+  drokex-adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+    networks:
+      - drokex-network
+
+volumes:
+  drokex-postgres-data:

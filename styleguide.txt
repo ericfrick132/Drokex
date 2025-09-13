@@ -1,0 +1,105 @@
+Manual de Marca Drokex - Guía Completa
+1. IDENTIDAD DE MARCA
+¿Qué es Drokex?
+Drokex es una plataforma de comercio electrónico multinacional que fusiona el modelo de dropshipping con un marketplace inteligente. Está diseñada para facilitar la expansión comercial de marcas y empresas hacia Honduras, Guatemala, República Dominicana, El Salvador y México, sin necesidad de presencia física.
+Es un ecosistema digital de comercio que permite a fabricantes, distribuidores y emprendedores internacionalizarse, gestionar su operación comercial y logística, recaudar pagos y ejecutar campañas de venta en mercados extranjeros desde un solo lugar.
+2. LOGOTIPO
+Concepto del logo:
+El logo desarrolla una fusión entre la letra "D" y una flecha en movimiento, simbolizando dinamismo, conexión y expansión comercial. Su diseño es moderno y minimalista, reflejando la esencia tecnológica de la plataforma.
+Construcción geométrica:
+
+El logo está construido sobre una retícula modular basada en la unidad "X"
+La flecha interior forma un ángulo de 45 grados
+Proporciones específicas: altura de 1/2X en ciertos elementos
+Relaciones proporcionales de x, x*2 para mantener consistencia
+
+Zona de resguardo:
+
+Se debe mantener un área de protección alrededor del logo equivalente a la unidad X
+Esta zona de resguardo solo aplica a elementos invasivos o textos ajenos a la marca
+Los anclajes al logo, taglines y títulos que acompañan el logo no están sujetos a esta restricción
+
+3. PALETA DE COLORES
+Colores Primarios:
+
+Verde lima: HEX #abd305 | RGB: 171, 211, 5 | CMYK: 42, 0, 97, 0
+Negro: HEX #161616 | RGB: 22, 22, 22 | CMYK: 78, 68, 61, 86
+Crema: HEX #fcffee | RGB: 252, 255, 238 | CMYK: 2, 0, 10, 0
+
+Colores Secundarios:
+
+Verde teal: HEX #006d5a | RGB: 0, 109, 90 | CMYK: 87, 32, 67, 22
+Verde pálido: HEX #d5ddb7 | RGB: 213, 221, 183 | CMYK: 21, 6, 35, 0
+
+Nota sobre degradados:
+Los degradados solo deben usarse como background con el logo en blanco.
+4. TIPOGRAFÍAS
+Tipografía Principal - Nagoda:
+
+Uso: Títulos y palabras relevantes
+Peso: Regular
+Caracteres disponibles: Alfabeto completo, números (0-9), caracteres especiales (!#$%&*?)
+
+Tipografía Secundaria - Manrope:
+
+Uso: Cuerpo de textos y subtítulos
+Pesos disponibles:
+
+ExtraLight
+Light
+Regular
+Medium
+SemiBold
+Bold
+Extra Bold
+
+
+Se pueden cambiar los pesos para destacar elementos relevantes
+Caracteres disponibles: Alfabeto completo, números (0-9), caracteres especiales (!@#$%^&*?)
+
+5. APLICACIONES
+Redes Sociales:
+
+Usar una de las 2 variables del logo (símbolo solo o logo completo)
+Mantener la misma variante en todas las redes sociales para consistencia visual
+Opciones de presentación:
+
+Logo en verde sobre fondo blanco con borde
+Logo blanco sobre fondo con degradado verde-teal
+Logo en verde sobre fondo verde lima sólido
+Logo completo "Drokex" en las mismas variantes de color
+
+
+
+Patrones y elementos gráficos:
+
+Patrón por repetición:
+
+Usar la flecha generada por el logo con o sin extensión
+Crear patrones en diferentes configuraciones:
+
+Patrón diamante con flechas alternadas en verde lima y teal
+Patrón chevron horizontal
+Patrón diagonal de líneas
+
+
+
+
+Logo por ampliación:
+
+Se puede usar una versión ampliada del logo donde solo se vea una porción
+Debe ser reconocible que es parte del logo de Drokex
+
+
+
+6. REGLAS DE USO IMPORTANTES
+
+Siempre respetar las proporciones del logo
+No distorsionar ni modificar los elementos del logo
+Mantener la legibilidad en todas las aplicaciones
+En fondos con degradado, usar siempre el logo en blanco
+La zona de resguardo es crítica para elementos externos, pero flexible para elementos de la propia marca
+Mantener consistencia en el uso de colores según la jerarquía establecida (primarios vs secundarios)
+Las tipografías deben usarse según su función designada: Nagoda para destacar, Manrope para informar
+
+Esta guía debe seguirse estrictamente para mantener la coherencia e identidad visual de la marca Drokex en todas sus aplicaciones y comunicaciones.

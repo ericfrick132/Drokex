@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "P2/IxnLvEclkKp8UmLwKfJwQnKXCFu0leq67Yz3tTng=",
+  "Source": "Dockex.API",
+  "BasePath": "_content/Dockex.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

@@ -1,0 +1,44 @@
+services:
+  drokex-api:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile
+    ports:
+      - "5100:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - PORT=5000
+      - ConnectionStrings__DefaultConnection=Host=${DB_HOST:-host.docker.internal};Database=${DB_NAME:-drokexdb};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-eric1234}
+      - FrontendUrl=http://localhost:3100
+      - AdditionalCorsOrigins=https://honduras.drokex.com,https://guatemala.drokex.com,https://mexico.drokex.com,https://dominicana.drokex.com,https://elsalvador.drokex.com
+      - Jwt__Key=drokex-secret-key-minimum-32-characters-long
+      - EnableSwaggerInProduction=true
+    networks:
+      - drokex-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  drokex-frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3100:3000"
+    environment:
+      - REACT_APP_API_URL=/api
+      - REACT_APP_MULTI_TENANT=true
+      - REACT_APP_BRAND_NAME=Drokex
+      - REACT_APP_PRIMARY_COLOR=#abd305
+      - REACT_APP_SECONDARY_COLOR=#006d5a
+      - REACT_APP_SUPPORTED_REGIONS=honduras,guatemala,mexico,dominicana,elsalvador
+    depends_on:
+      - drokex-api
+    restart: unless-stopped
+    networks:
+      - drokex-network
+
+networks:
+  drokex-network:
+    driver: bridge
+    name: drokex-network
