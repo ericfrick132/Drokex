@@ -2,12 +2,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy csproj and restore as distinct layers
-COPY src/backend/Dockex.API/Dockex.API.csproj ./
+# Copy csproj and restore as distinct layers (paths are relative to build context: src/backend)
+COPY Dockex.API/Dockex.API.csproj ./
 RUN dotnet restore
 
 # Copy everything else and build
-COPY src/backend/Dockex.API/ ./
+COPY Dockex.API/ ./
 RUN dotnet publish -c Release -o out
 
 # Runtime stage
