@@ -22,6 +22,23 @@ const TenantsList: React.FC = () => {
     currencySymbol: '$',
     adminEmail: ''
   });
+  const [subdomainTouched, setSubdomainTouched] = useState(false);
+
+  // Helper: sanitize to a valid subdomain label (RFC 1034/1123-ish)
+  const toSubdomain = (raw: string) => {
+    if (!raw) return '';
+    // remove diacritics, lower, replace non-alphanum with hyphen
+    let s = raw
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/-{2,}/g, '-')
+      .replace(/^-+|-+$/g, '');
+    // enforce max label length 63
+    if (s.length > 63) s = s.slice(0, 63).replace(/-+$/g, '');
+    return s;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('superadmin_token');
@@ -140,8 +157,30 @@ const TenantsList: React.FC = () => {
         <DialogTitle>Crear Empresa</DialogTitle>
         <DialogContent dividers>
           <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mt={1}>
-            <TextField label="Nombre" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} fullWidth />
-            <TextField label="Subdominio" value={form.subdomain} onChange={e => setForm({ ...form, subdomain: e.target.value })} fullWidth />
+            <TextField 
+              label="Nombre"
+              value={form.name}
+              onChange={e => {
+                const name = e.target.value;
+                setForm(prev => ({
+                  ...prev,
+                  name,
+                  subdomain: subdomainTouched ? prev.subdomain : toSubdomain(name),
+                }));
+              }} 
+              fullWidth 
+            />
+            <TextField 
+              label="Subdominio"
+              value={form.subdomain}
+              onChange={e => {
+                const sanitized = toSubdomain(e.target.value);
+                setSubdomainTouched(true);
+                setForm(prev => ({ ...prev, subdomain: sanitized }));
+              }}
+              helperText="Solo letras, números y guiones; máx. 63 caracteres"
+              fullWidth 
+            />
             <TextField label="País" value={form.country} onChange={e => setForm({ ...form, country: e.target.value })} fullWidth />
             <TextField label="Código País" value={form.countryCode} onChange={e => setForm({ ...form, countryCode: e.target.value })} fullWidth />
             <TextField label="Moneda" value={form.currency} onChange={e => setForm({ ...form, currency: e.target.value })} fullWidth />
