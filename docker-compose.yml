@@ -1,8 +1,8 @@
 services:
   drokex-api:
     build:
-      context: .
-      dockerfile: src/backend/Dockerfile
+      context: ./src/backend
+      dockerfile: Dockerfile
     ports:
       - "5100:5000"
     environment:
