@@ -6,6 +6,16 @@ import { Add, Edit, Login, Launch, CheckCircle } from '@mui/icons-material';
 import superadminApi from '../../services/superadminApi';
 import { drokexColors } from '../../theme/drokexTheme';
 
+type FormState = {
+  name: string;
+  subdomain: string;
+  country: string;
+  countryCode: string;
+  currency: string;
+  currencySymbol: string;
+  adminEmail: string;
+};
+
 const TenantsList: React.FC = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
@@ -13,7 +23,7 @@ const TenantsList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [openCreate, setOpenCreate] = useState(params.get('create') === '1');
   const [showPendingOnly, setShowPendingOnly] = useState(false);
-  const [form, setForm] = useState<any>({
+  const [form, setForm] = useState<FormState>({
     name: '',
     subdomain: '',
     country: '',
@@ -162,7 +172,7 @@ const TenantsList: React.FC = () => {
               value={form.name}
               onChange={e => {
                 const name = e.target.value;
-                setForm(prev => ({
+                setForm((prev: FormState) => ({
                   ...prev,
                   name,
                   subdomain: subdomainTouched ? prev.subdomain : toSubdomain(name),
@@ -176,7 +186,7 @@ const TenantsList: React.FC = () => {
               onChange={e => {
                 const sanitized = toSubdomain(e.target.value);
                 setSubdomainTouched(true);
-                setForm(prev => ({ ...prev, subdomain: sanitized }));
+                setForm((prev: FormState) => ({ ...prev, subdomain: sanitized }));
               }}
               helperText="Solo letras, números y guiones; máx. 63 caracteres"
               fullWidth 
