@@ -46,7 +46,7 @@ const TenantDetail: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700, mb: 3 }}>Editar Tenant</Typography>
+      <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700, mb: 3 }}>Editar Empresa</Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           <DrokexCard>

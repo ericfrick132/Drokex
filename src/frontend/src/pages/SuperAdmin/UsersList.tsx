@@ -24,7 +24,7 @@ const UsersList: React.FC = () => {
     const map = new Map<number, { tenantName: string; users: any[] }>();
     for (const u of items) {
       const id = u.tenant?.id || 0;
-      const name = u.tenant?.name || 'Sin Tenant';
+      const name = u.tenant?.name || 'Sin Empresa';
       if (!map.has(id)) map.set(id, { tenantName: name, users: [] });
       map.get(id)!.users.push(u);
     }
@@ -35,7 +35,7 @@ const UsersList: React.FC = () => {
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700 }}>Usuarios</Typography>
-        <TextField size="small" label="Filtrar por TenantId" value={tenantId} onChange={e => setTenantId(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') load(); }} />
+        <TextField size="small" label="Filtrar por EmpresaId" value={tenantId} onChange={e => setTenantId(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') load(); }} />
       </Box>
       {grouped.map(group => (
         <Box key={group.tenantId} sx={{ mb: 2 }}>

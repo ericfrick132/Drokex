@@ -148,10 +148,10 @@ const SuperAdminDashboard: React.FC = () => {
           {/* Quick stats */}
           <Grid container spacing={2} mb={3}>
             <Grid item xs={12} sm={6} md={3}>
-              <StatCard icon={<Domain />} label="Tenants Totales" value={analytics?.summary?.totalTenants ?? 0} loading={loading} />
+              <StatCard icon={<Domain />} label="Empresas Totales" value={analytics?.summary?.totalTenants ?? 0} loading={loading} />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <StatCard icon={<CloudQueue />} label="Tenants Activos" value={analytics?.summary?.activeTenants ?? 0} loading={loading} />
+              <StatCard icon={<CloudQueue />} label="Empresas Activas" value={analytics?.summary?.activeTenants ?? 0} loading={loading} />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
               <StatCard icon={<Groups />} label="Usuarios Totales" value={analytics?.summary?.totalUsers ?? 0} loading={loading} />
@@ -166,7 +166,7 @@ const SuperAdminDashboard: React.FC = () => {
             <Grid item xs={12} md={7}>
               <DrokexCard>
                 <CardHeader
-                  title={<Typography variant="h6">Tenants</Typography>}
+                  title={<Typography variant="h6">Empresas</Typography>}
                   subheader="Gestión centralizada de marketplaces"
                 />
                 <Divider />
@@ -191,8 +191,8 @@ const SuperAdminDashboard: React.FC = () => {
                         ))}
                       </Grid>
                       <Box mt={2} display="flex" gap={2}>
-                        <Button variant="contained" component={RouterLink} to="/superadmin/tenants">Ver Tenants</Button>
-                        <Button variant="outlined" component={RouterLink} to="/superadmin/tenants?create=1">Crear Tenant</Button>
+                        <Button variant="contained" component={RouterLink} to="/superadmin/tenants">Ver Empresas</Button>
+                        <Button variant="outlined" component={RouterLink} to="/superadmin/tenants?create=1">Crear Empresa</Button>
                       </Box>
                     </>
                   )}
@@ -218,7 +218,7 @@ const SuperAdminDashboard: React.FC = () => {
                     <Grid item xs={12}>
                       <Link component={RouterLink} to="/superadmin/tenants" underline="none">
                         <DrokexButton variant="secondary" fullWidth>
-                          Gestionar Tenants
+                          Gestionar Empresas
                         </DrokexButton>
                       </Link>
                     </Grid>

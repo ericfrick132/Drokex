@@ -51,12 +51,12 @@ const TenantsList: React.FC = () => {
   return (
     <Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700 }}>Tenants</Typography>
+        <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700 }}>Empresas</Typography>
         <Box display="flex" gap={1}>
           <Button variant={showPendingOnly ? 'outlined' : 'text'} onClick={() => setShowPendingOnly(v => !v)}>
             {showPendingOnly ? 'Ver todos' : 'Ver pendientes'}
           </Button>
-          <Button variant="contained" startIcon={<Add />} onClick={() => setOpenCreate(true)}>Crear Tenant</Button>
+          <Button variant="contained" startIcon={<Add />} onClick={() => setOpenCreate(true)}>Crear Empresa</Button>
         </Box>
       </Box>
       <DrokexCard>
@@ -93,7 +93,7 @@ const TenantsList: React.FC = () => {
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
                       {!t.isActive && (
-                        <Tooltip title="Aprobar tenant">
+                        <Tooltip title="Aprobar empresa">
                           <IconButton size="small" color="success" onClick={async () => {
                             try { await superadminApi.approveTenant(t.id); await load(); } catch {}
                           }}>
@@ -128,7 +128,7 @@ const TenantsList: React.FC = () => {
               ))}
               {!loading && items.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6}>No hay tenants</TableCell>
+                  <TableCell colSpan={6}>No hay empresas</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -137,7 +137,7 @@ const TenantsList: React.FC = () => {
       </DrokexCard>
 
       <Dialog open={openCreate} onClose={() => setOpenCreate(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Crear Tenant</DialogTitle>
+        <DialogTitle>Crear Empresa</DialogTitle>
         <DialogContent dividers>
           <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mt={1}>
             <TextField label="Nombre" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} fullWidth />

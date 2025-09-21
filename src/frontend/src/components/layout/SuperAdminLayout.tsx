@@ -43,7 +43,7 @@ const SuperAdminLayout: React.FC<Props> = ({ children }) => {
           </Box>
           <Typography variant="h6" sx={{ fontWeight: 700, mr: 2, display: { xs: 'none', sm: 'block' } }}>Super Admin</Typography>
           <NavButton label="Dashboard" to="/superadmin/dashboard" icon={<Dashboard />} />
-          <NavButton label="Tenants" to="/superadmin/tenants" icon={<Domain />} />
+          <NavButton label="Empresas" to="/superadmin/tenants" icon={<Domain />} />
           <NavButton label="Usuarios" to="/superadmin/users" icon={<Group />} />
           <Box sx={{ ml: 'auto' }}>
             <IconButton color="inherit" onClick={logout} title="Salir">
