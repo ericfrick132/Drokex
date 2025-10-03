@@ -42,8 +42,9 @@ import {
 } from '../components/common';
 import { drokexColors } from '../theme/drokexTheme';
 import PublicNavbar from '../components/layout/PublicNavbar';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import BitsReveal from '../components/bits/BitsReveal';
+import BitsParallax from '../components/bits/BitsParallax';
+import BitsTilt from '../components/bits/BitsTilt';
 
 interface LeadFormData {
   companyName: string;
@@ -198,60 +199,7 @@ const LandingPage: React.FC = () => {
     'API para integraciones personalizadas',
   ];
 
-  useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    // Hero entrance
-    if (heroRef.current) {
-      const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
-      tl.from(heroRef.current.querySelector('.lp-hero-logo'), { y: -20, opacity: 0, duration: 0.6 })
-        .from(heroRef.current.querySelector('.lp-hero-chip'), { y: -10, opacity: 0, duration: 0.4 }, '-=0.3')
-        .from(heroRef.current.querySelector('.lp-hero-title'), { y: 20, opacity: 0, duration: 0.6 }, '-=0.1')
-        .from(heroRef.current.querySelector('.lp-hero-subtitle'), { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
-        .from(heroRef.current.querySelector('.lp-hero-cta'), { y: 20, opacity: 0, duration: 0.6 }, '-=0.4');
-    }
-
-    // Benefits cards reveal
-    if (benefitsRef.current) {
-      const cards = benefitsRef.current.querySelectorAll('.lp-benefit');
-      gsap.set(cards, { y: 24, opacity: 0 });
-      cards.forEach((card, i) => {
-        gsap.to(card, {
-          y: 0,
-          opacity: 1,
-          duration: 0.6,
-          delay: i * 0.06,
-          scrollTrigger: {
-            trigger: card as Element,
-            start: 'top 85%',
-          },
-        });
-      });
-    }
-
-    // Features section subtle rise
-    if (featuresRef.current) {
-      gsap.from(featuresRef.current, {
-        y: 24,
-        opacity: 0,
-        duration: 0.7,
-        scrollTrigger: { trigger: featuresRef.current, start: 'top 80%' },
-      });
-    }
-
-    // Lead form card pop-in
-    if (leadFormRef.current) {
-      const card = leadFormRef.current.querySelector('.lp-lead-card');
-      if (card) {
-        gsap.from(card, {
-          y: 18,
-          opacity: 0,
-          duration: 0.6,
-          scrollTrigger: { trigger: leadFormRef.current, start: 'top 85%' },
-        });
-      }
-    }
-  }, []);
+  // Animations are now driven by react-bits components only.
 
   return (
     <Box sx={{ backgroundColor: drokexColors.light, minHeight: '100vh' }}>
@@ -260,8 +208,16 @@ const LandingPage: React.FC = () => {
       {/* Hero Section con Degradado */}
       <DrokexPattern pattern="gradient" opacity={1}>
         <Container maxWidth="lg" sx={{ pt: 8, pb: 10, textAlign: 'center' }} ref={heroRef}>
-          <Box sx={{ mb: 4 }} className="lp-hero-logo">
-            <DrokexLogo variant="full" size="large" color="white" />
+          <Box sx={{ position: 'relative', mb: 4 }} className="lp-hero-logo">
+            <BitsParallax strength={24} sx={{ position: 'absolute', top: -16, left: '15%', zIndex: 0, opacity: 0.18 }}>
+              <Box sx={{ width: 120, height: 120, borderRadius: '50%', background: 'white' }} />
+            </BitsParallax>
+            <BitsParallax strength={-16} sx={{ position: 'absolute', top: -8, right: '18%', zIndex: 0, opacity: 0.18 }}>
+              <Box sx={{ width: 80, height: 80, borderRadius: 2, background: 'white', transform: 'rotate(12deg)' }} />
+            </BitsParallax>
+            <Box sx={{ position: 'relative', zIndex: 1 }}>
+              <DrokexLogo variant="full" size="large" color="white" />
+            </Box>
           </Box>
 
           {(() => {
@@ -315,44 +271,67 @@ const LandingPage: React.FC = () => {
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }} className="lp-hero-cta">
-            <DrokexButton
-              variant="primary"
-              size="large"
-              onClick={() => navigate('/register')}
+            <BitsTilt>
+              <DrokexButton
+                variant="primary"
+                size="large"
+                onClick={() => navigate('/register')}
+                sx={{ fontSize: '1.1rem', px: 4, py: 1.5, backgroundColor: 'white', color: drokexColors.primary }}
+              >
+                Quiero vender (Proveedor)
+              </DrokexButton>
+            </BitsTilt>
+
+            <BitsTilt>
+              <DrokexButton
+                variant="outline"
+                size="large"
+                onClick={() => navigate('/catalog')}
+                sx={{ fontSize: '1.1rem', px: 4, py: 1.5, borderColor: 'white', color: 'white' }}
+              >
+                Buscar Proveedores
+              </DrokexButton>
+            </BitsTilt>
+
+            <BitsTilt>
+              <DrokexButton
+                variant="ghost"
+                size="large"
+                onClick={() => navigate('/signup')}
+                sx={{ fontSize: '1.1rem', px: 4, py: 1.5, color: 'white' }}
+              >
+                Registrarme como Comprador
+              </DrokexButton>
+            </BitsTilt>
+          </Box>
+
+          {/* Buscador rápido en el hero */}
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+            <Paper
+              component="form"
+              onSubmit={(e: any) => {
+                e.preventDefault();
+                const v = (e.target?.query?.value || '').trim();
+                navigate(`/catalog${v ? `?search=${encodeURIComponent(v)}` : ''}`);
+              }}
               sx={{
-                fontSize: '1.1rem',
-                px: 4,
-                py: 1.5,
-                backgroundColor: 'white',
-                color: drokexColors.primary,
-                '&:hover': {
-                  backgroundColor: drokexColors.light,
-                  transform: 'translateY(-2px)',
-                },
+                p: 1,
+                display: 'flex',
+                alignItems: 'center',
+                width: { xs: '100%', sm: 520 },
+                backgroundColor: 'rgba(255,255,255,0.92)',
+                borderRadius: 3,
               }}
             >
-              {heroCTA}
-            </DrokexButton>
-            
-            <DrokexButton
-              variant="outline"
-              size="large"
-              onClick={() => navigate('/catalog')}
-              sx={{
-                fontSize: '1.1rem',
-                px: 4,
-                py: 1.5,
-                borderColor: 'white',
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  borderColor: 'white',
-                  color: 'white',
-                },
-              }}
-            >
-              Ver Catálogo
-            </DrokexButton>
+              <TextField
+                name="query"
+                placeholder="Buscar productos o empresas…"
+                variant="standard"
+                fullWidth
+                InputProps={{ disableUnderline: true, sx: { px: 1 } }}
+              />
+              <DrokexButton type="submit" variant="primary" sx={{ ml: 1 }}>Buscar</DrokexButton>
+            </Paper>
           </Box>
         </Container>
       </DrokexPattern>
@@ -388,33 +367,37 @@ const LandingPage: React.FC = () => {
         <Grid container spacing={4}>
           {benefits.map((benefit, index) => (
             <Grid item xs={12} md={6} key={index} className="lp-benefit">
-              <DrokexCard variant="interactive" sx={{ height: '100%' }}>
-                <DrokexCardContent>
-                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                    <Box sx={{ mt: 1 }}>
-                      {benefit.icon}
-                    </Box>
-                    <Box>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: drokexColors.dark,
-                          fontWeight: 400,
-                          mb: 1,
-                        }}
-                      >
-                        {benefit.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: drokexColors.secondary }}
-                      >
-                        {benefit.description}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </DrokexCardContent>
-              </DrokexCard>
+              <BitsReveal effect="up">
+                <BitsTilt>
+                  <DrokexCard variant="interactive" sx={{ height: '100%' }}>
+                    <DrokexCardContent>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                        <Box sx={{ mt: 1 }}>
+                          {benefit.icon}
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              color: drokexColors.dark,
+                              fontWeight: 400,
+                              mb: 1,
+                            }}
+                          >
+                            {benefit.title}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: drokexColors.secondary }}
+                          >
+                            {benefit.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </DrokexCardContent>
+                  </DrokexCard>
+                </BitsTilt>
+              </BitsReveal>
             </Grid>
           ))}
         </Grid>
@@ -466,47 +449,49 @@ const LandingPage: React.FC = () => {
                 ))}
               </List>
 
-              <DrokexButton
-                variant="primary"
-                onClick={() => navigate('/register')}
-                sx={{ px: 3, py: 1.5 }}
-              >
-                Comenzar Gratis
-              </DrokexButton>
+            <DrokexButton
+              variant="primary"
+              onClick={() => navigate('/register-choice')}
+              sx={{ px: 3, py: 1.5 }}
+            >
+              Comenzar Gratis
+            </DrokexButton>
             </Grid>
 
             <Grid item xs={12} md={6}>
-              <DrokexCard variant="bordered" borderColor="primary">
-                <DrokexCardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      mb: 2,
-                      color: drokexColors.dark,
-                      fontWeight: 400,
-                    }}
-                  >
-                    Funcionalidades Incluidas
-                  </Typography>
-                  
-                  <List>
-                    {features.slice(4).map((feature, index) => (
-                      <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
-                        <ListItemIcon sx={{ minWidth: 28 }}>
-                          <CheckCircle sx={{ color: drokexColors.secondary, fontSize: 18 }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={feature}
-                          primaryTypographyProps={{
-                            fontSize: '0.9rem',
-                            color: drokexColors.secondary,
-                          }}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </DrokexCardContent>
-              </DrokexCard>
+              <BitsReveal effect="left">
+                <DrokexCard variant="bordered" borderColor="primary">
+                  <DrokexCardContent>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        mb: 2,
+                        color: drokexColors.dark,
+                        fontWeight: 400,
+                      }}
+                    >
+                      Funcionalidades Incluidas
+                    </Typography>
+                    
+                    <List>
+                      {features.slice(4).map((feature, index) => (
+                        <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
+                          <ListItemIcon sx={{ minWidth: 28 }}>
+                            <CheckCircle sx={{ color: drokexColors.secondary, fontSize: 18 }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={feature}
+                            primaryTypographyProps={{
+                              fontSize: '0.9rem',
+                              color: drokexColors.secondary,
+                            }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </DrokexCardContent>
+                </DrokexCard>
+              </BitsReveal>
             </Grid>
           </Grid>
         </Container>
@@ -539,8 +524,9 @@ const LandingPage: React.FC = () => {
             </Typography>
           </Box>
 
-          <DrokexCard variant="elevated">
-            <DrokexCardContent className="lp-lead-card">
+          <BitsReveal effect="up">
+            <DrokexCard variant="elevated">
+              <DrokexCardContent className="lp-lead-card">
               {submitSuccess && (
                 <Alert
                   severity="success"
@@ -640,7 +626,8 @@ const LandingPage: React.FC = () => {
                 </Box>
               </Box>
             </DrokexCardContent>
-          </DrokexCard>
+            </DrokexCard>
+          </BitsReveal>
         </Container>
       </DrokexPattern>
 

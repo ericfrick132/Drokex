@@ -6,6 +6,7 @@ using Dockex.API.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dockex.API.Controllers;
 
@@ -82,11 +83,13 @@ public class AuthController : ControllerBase
             // Opcional: validar token mínimamente
             // Si el token es inválido, la autenticación posterior lo rechazará igualmente.
 
+            // Determinar si la solicitud es segura para setear cookie Secure en producción
+            var isSecure = HttpContext.Request.IsHttps || string.Equals(HttpContext.Request.Headers["X-Forwarded-Proto"], "https", StringComparison.OrdinalIgnoreCase);
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 SameSite = SameSiteMode.Lax,
-                Secure = false, // En producción, considerar true (HTTPS)
+                Secure = isSecure,
                 Expires = DateTimeOffset.UtcNow.AddHours(1),
                 Path = "/"
                 // No establecer Domain: que el navegador use el host exacto (incluye subdominio)
@@ -109,6 +112,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult<ApiResponseDto<AuthResponseDto>>> Login([FromBody] LoginDto loginDto)
     {
         try
@@ -174,6 +178,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("forgot-password")]
     [AllowAnonymous]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult<ApiResponseDto<bool>>> ForgotPassword([FromBody] ForgotPasswordDto dto)
     {
         try
@@ -213,6 +218,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("reset-password")]
     [AllowAnonymous]
+    [EnableRateLimiting("Auth")]
     public async Task<ActionResult<ApiResponseDto<bool>>> ResetPassword([FromBody] ResetPasswordDto dto)
     {
         try

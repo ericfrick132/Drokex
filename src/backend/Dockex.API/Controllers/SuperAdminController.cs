@@ -358,6 +358,22 @@ public class SuperAdminController : ControllerBase
         }
     }
 
+    [HttpGet("tenants/check-subdomain/{subdomain}")]
+    public async Task<IActionResult> CheckSubdomainAvailability([FromRoute] string subdomain)
+    {
+        if (!IsSuperAdmin() || !HasPermission("ManageTenants"))
+        {
+            return Forbid();
+        }
+        if (string.IsNullOrWhiteSpace(subdomain))
+        {
+            return BadRequest(new { success = false, message = "Subdomain requerido", available = false });
+        }
+        var normalized = subdomain.Trim().ToLower();
+        var exists = await _context.Tenants.AnyAsync(t => t.Subdomain == normalized);
+        return Ok(new { success = true, available = !exists });
+    }
+
     [HttpPut("tenants/{id}")]
     public async Task<IActionResult> UpdateTenant(int id, [FromBody] UpdateTenantDto dto)
     {

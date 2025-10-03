@@ -275,6 +275,15 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
 
   // Detectar tenant desde URL al cargar
   useEffect(() => {
+    // Evitar cargar tenant en rutas de SuperAdmin
+    try {
+      const path = window.location.pathname;
+      if (path.startsWith('/superadmin')) {
+        setIsLoading(false);
+        return;
+      }
+    } catch {}
+
     const detectTenantFromUrl = () => {
       // Detectar desde subdomain (prod: sub.drokex.com; dev: sub.localhost)
       const hostname = window.location.hostname;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTenant } from './contexts/TenantContext';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { drokexColors } from './theme/drokexTheme';
@@ -22,6 +22,8 @@ import AdminCompaniesPending from './pages/AdminCompaniesPending';
 import AdminCategories from './pages/AdminCategories';
 import AdminUsers from './pages/AdminUsers';
 import Register from './pages/Register';
+import RegisterChoice from './pages/RegisterChoice';
+import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
@@ -93,106 +95,8 @@ const ComingSoon: React.FC<{ title: string }> = ({ title }) => (
   </Box>
 );
 
-const AppRoutes: React.FC = () => {
-  const { tenant, isLoading, error } = useTenant();
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          backgroundColor: drokexColors.light,
-          gap: 2,
-        }}
-      >
-        <CircularProgress 
-          sx={{ color: drokexColors.primary }}
-          size={40}
-        />
-        <Typography 
-          variant="body2" 
-          sx={{ color: drokexColors.secondary }}
-        >
-          Cargando marketplace...
-        </Typography>
-      </Box>
-    );
-  }
-
-  // Error state
-  if (error && !tenant) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          backgroundColor: drokexColors.light,
-          padding: '2rem',
-        }}
-      >
-        <Box
-          sx={{
-            backgroundColor: 'white',
-            padding: '2rem',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            textAlign: 'center',
-            maxWidth: '400px',
-          }}
-        >
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              color: drokexColors.dark, 
-              marginBottom: '1rem',
-              fontWeight: 600,
-            }}
-          >
-            Error de Conexión
-          </Typography>
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: drokexColors.secondary, 
-              marginBottom: '1.5rem' 
-            }}
-          >
-            {error}
-          </Typography>
-          <Box
-            component="button"
-            onClick={() => window.location.reload()}
-            sx={{
-              backgroundColor: drokexColors.primary,
-              color: drokexColors.dark,
-              padding: '0.75rem 1.5rem',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontSize: '1rem',
-              '&:hover': {
-                backgroundColor: drokexColors.secondary,
-                color: 'white',
-              },
-            }}
-          >
-            Reintentar
-          </Box>
-        </Box>
-      </Box>
-    );
-  }
-
-  return (
-    <Routes>
+const MainRoutesInner: React.FC = () => (
+  <Routes>
       {/* Rutas públicas */}
       <Route
         path="/"
@@ -220,6 +124,22 @@ const AppRoutes: React.FC = () => {
           </PublicRoute>
         }
       />
+      <Route
+        path="/register-choice"
+        element={
+          <PublicRoute>
+            <RegisterChoice />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
 
       <Route
         path="/forgot-password"
@@ -241,14 +161,6 @@ const AppRoutes: React.FC = () => {
 
       <Route path="/catalog" element={<Catalog />} />
       <Route path="/catalog/:id" element={<ProductDetail />} />
-
-      {/* Rutas de Super Admin - sin tenant provider */}
-      <Route path="/superadmin/login" element={<SuperAdminLogin />} />
-      <Route path="/superadmin/dashboard" element={<SuperAdminRoute><SuperAdminLayout><SuperAdminDashboard /></SuperAdminLayout></SuperAdminRoute>} />
-      <Route path="/superadmin/tenants" element={<SuperAdminRoute><SuperAdminLayout><TenantsList /></SuperAdminLayout></SuperAdminRoute>} />
-      <Route path="/superadmin/tenants/:id" element={<SuperAdminRoute><SuperAdminLayout><TenantDetail /></SuperAdminLayout></SuperAdminRoute>} />
-      <Route path="/superadmin/users" element={<SuperAdminRoute><SuperAdminLayout><UsersList /></SuperAdminLayout></SuperAdminRoute>} />
-      <Route path="/superadmin/landing" element={<SuperAdminRoute><SuperAdminLayout><LandingCMS /></SuperAdminLayout></SuperAdminRoute>} />
 
       {/* Rutas protegidas con layout */}
       <Route
@@ -451,8 +363,59 @@ const AppRoutes: React.FC = () => {
           </Box>
         }
       />
-    </Routes>
-  );
+  </Routes>
+);
+
+const MainWrapper: React.FC = () => {
+  const { tenant, isLoading, error } = useTenant();
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: drokexColors.light, gap: 2 }}>
+        <CircularProgress sx={{ color: drokexColors.primary }} size={40} />
+        <Typography variant="body2" sx={{ color: drokexColors.secondary }}>Cargando marketplace...</Typography>
+      </Box>
+    );
+  }
+
+  if (error && !tenant) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: drokexColors.light, padding: '2rem' }}>
+        <Box sx={{ backgroundColor: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', textAlign: 'center', maxWidth: '400px' }}>
+          <Typography variant="h5" sx={{ color: drokexColors.dark, marginBottom: '1rem', fontWeight: 600 }}>Error de Conexión</Typography>
+          <Typography variant="body1" sx={{ color: drokexColors.secondary, marginBottom: '1.5rem' }}>{error}</Typography>
+          <Box component="button" onClick={() => window.location.reload()} sx={{ backgroundColor: drokexColors.primary, color: drokexColors.dark, padding: '0.75rem 1.5rem', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '1rem', '&:hover': { backgroundColor: drokexColors.secondary, color: 'white' } }}>
+            Reintentar
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  return <MainRoutesInner />;
 };
+
+const SuperAdminRoutes: React.FC = () => (
+  <Routes>
+    <Route index element={<Navigate to="login" replace />} />
+    <Route path="login" element={<SuperAdminLogin />} />
+    <Route element={<SuperAdminRoute><SuperAdminLayout /></SuperAdminRoute>}>
+      <Route path="dashboard" element={<SuperAdminDashboard />} />
+      <Route path="tenants" element={<TenantsList />} />
+      <Route path="tenants/:id" element={<TenantDetail />} />
+      <Route path="empresas" element={<TenantsList />} />
+      <Route path="empresas/:id" element={<TenantDetail />} />
+      <Route path="users" element={<UsersList />} />
+      <Route path="landing" element={<LandingCMS />} />
+    </Route>
+  </Routes>
+);
+
+const AppRoutes: React.FC = () => (
+  <Routes>
+    <Route path="/superadmin/*" element={<SuperAdminRoutes />} />
+    <Route path="/*" element={<MainWrapper />} />
+  </Routes>
+);
 
 export default AppRoutes;

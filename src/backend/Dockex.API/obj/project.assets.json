@@ -3719,11 +3719,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\code\\efcloud\\projects\\Drokex\\src\\backend\\Dockex.API\\Dockex.API.csproj",
+      "projectUniqueName": "D:\\code\\efcloud\\projects\\CLIENTS\\Drokex\\src\\backend\\Dockex.API\\Dockex.API.csproj",
       "projectName": "Dockex.API",
-      "projectPath": "D:\\code\\efcloud\\projects\\Drokex\\src\\backend\\Dockex.API\\Dockex.API.csproj",
+      "projectPath": "D:\\code\\efcloud\\projects\\CLIENTS\\Drokex\\src\\backend\\Dockex.API\\Dockex.API.csproj",
       "packagesPath": "C:\\Users\\EricFrick\\.nuget\\packages\\",
-      "outputPath": "D:\\code\\efcloud\\projects\\Drokex\\src\\backend\\Dockex.API\\obj\\",
+      "outputPath": "D:\\code\\efcloud\\projects\\CLIENTS\\Drokex\\src\\backend\\Dockex.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\EricFrick\\AppData\\Roaming\\NuGet\\NuGet.Config",

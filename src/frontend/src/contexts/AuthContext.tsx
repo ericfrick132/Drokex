@@ -94,6 +94,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
+      // Evitar cargar perfil de usuario (tenant) en rutas de SuperAdmin
+      try {
+        const path = window.location.pathname;
+        if (path.startsWith('/superadmin')) {
+          dispatch({ type: 'SET_LOADING', payload: false });
+          return;
+        }
+      } catch {}
+
       const token = getAuthToken();
       const refreshToken = localStorage.getItem('drokex_refresh_token');
 

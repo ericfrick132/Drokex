@@ -32,6 +32,7 @@ export const superadminApi = {
   createTenant: (data: any) => superAdminClient.post('/superadmin/tenants', data),
   updateTenant: (id: number, data: any) => superAdminClient.put(`/superadmin/tenants/${id}`, data),
   approveTenant: (id: number) => superAdminClient.post(`/superadmin/tenants/${id}/approve`),
+  checkSubdomain: (subdomain: string) => superAdminClient.get(`/superadmin/tenants/check-subdomain/${encodeURIComponent(subdomain)}`),
 
   // Users
   getUsers: (tenantId?: number) => superAdminClient.get('/superadmin/users', { params: { tenantId } }),

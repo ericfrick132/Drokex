@@ -7,6 +7,7 @@ using System.Text;
 using Dockex.API.Data;
 using Dockex.API.Models;
 using Dockex.API.DTOs;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dockex.API.Controllers;
 
@@ -29,6 +30,7 @@ public class SuperAdminAuthController : ControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting("Auth")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         try

@@ -7,6 +7,8 @@ using Dockex.API.Data;
 using Dockex.API.Services;
 using Dockex.API.Utilities;
 using Dockex.API.Middleware;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 Console.WriteLine("=== INICIANDO APLICACIÓN DROKEX MULTI-TENANT ===");
 Console.WriteLine($"Puerto Environment Variable: {Environment.GetEnvironmentVariable("PORT")}");
@@ -17,6 +19,38 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+// Rate limiting (básico): limitar intentos de auth y uploads por IP
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    // Política para autenticación: 5 req/min por IP
+    options.AddPolicy("Auth", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }
+        )
+    );
+    // Política para uploads: 20 req/10min por IP
+    options.AddPolicy("Upload", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(10),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }
+        )
+    );
+});
 
 // ==========================================
 // CONFIGURACIÓN MULTI-TENANT DROKEX
@@ -246,6 +280,9 @@ if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Ena
 
 app.UseHttpsRedirection();
 app.UseCors("AllowDrokexTenants");
+
+// Habilitar rate limiter
+app.UseRateLimiter();
 
 // MIDDLEWARE CRÍTICO: Resolución de tenant ANTES de auth
 app.UseTenantResolution();

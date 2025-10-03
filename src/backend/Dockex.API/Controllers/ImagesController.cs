@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Dockex.API.DTOs;
 using Dockex.API.Services;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Dockex.API.Controllers;
 
@@ -20,6 +21,7 @@ public class ImagesController : ControllerBase
 
     [HttpPost("upload")]
     [Authorize(Roles = "Provider,Admin")]
+    [EnableRateLimiting("Upload")]
     [RequestSizeLimit(20_000_000)] // 20 MB
     public async Task<ActionResult<ApiResponseDto<string>>> Upload()
     {
@@ -34,6 +36,12 @@ public class ImagesController : ControllerBase
             if (file.Length == 0)
             {
                 return BadRequest(new ApiResponseDto<string>("Empty file"));
+            }
+
+            // Validar tipo MIME básico
+            if (string.IsNullOrWhiteSpace(file.ContentType) || !file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new ApiResponseDto<string>("Invalid image type"));
             }
 
             var result = await _storage.UploadAsync(file.OpenReadStream(), file.FileName, file.ContentType, HttpContext.RequestAborted);
@@ -51,4 +59,3 @@ public class ImagesController : ControllerBase
         }
     }
 }
-

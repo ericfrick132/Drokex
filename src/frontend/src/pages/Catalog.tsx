@@ -30,10 +30,12 @@ const Catalog: React.FC = () => {
       } catch {}
     };
     loadCategories();
-    // Read companyId from query on first load
+    // Read params from query on first load
     const params = new URLSearchParams(location.search);
     const cid = params.get('companyId');
     if (cid) setCompanyId(Number(cid));
+    const q = params.get('search');
+    if (q) setSearch(q);
     return () => { cancelled = true; };
   }, []);
 

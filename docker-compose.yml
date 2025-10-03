@@ -25,6 +25,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3100:3000"
+    depends_on:
+      - drokex-api
     environment:
       - REACT_APP_API_URL=/api
       - REACT_APP_MULTI_TENANT=true
@@ -32,8 +34,6 @@ services:
       - REACT_APP_PRIMARY_COLOR=#abd305
       - REACT_APP_SECONDARY_COLOR=#006d5a
       - REACT_APP_SUPPORTED_REGIONS=honduras,guatemala,mexico,dominicana,elsalvador
-    depends_on:
-      - drokex-api
     restart: unless-stopped
     networks:
       - drokex-network

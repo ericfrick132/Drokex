@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Chip, Tooltip, Stack } from '@mui/material';
 import { DrokexCard, DrokexCardContent } from '../../components/common';
 import { Add, Edit, Login, Launch, CheckCircle } from '@mui/icons-material';
@@ -18,10 +18,10 @@ type FormState = {
 
 const TenantsList: React.FC = () => {
   const navigate = useNavigate();
-  const [params, setParams] = useSearchParams();
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [openCreate, setOpenCreate] = useState(params.get('create') === '1');
+  const [error, setError] = useState<string | null>(null);
+  const [openCreate, setOpenCreate] = useState<boolean>(false);
   const [showPendingOnly, setShowPendingOnly] = useState(false);
   const [form, setForm] = useState<FormState>({
     name: '',
@@ -33,6 +33,8 @@ const TenantsList: React.FC = () => {
     adminEmail: ''
   });
   const [subdomainTouched, setSubdomainTouched] = useState(false);
+  const [subdomainStatus, setSubdomainStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle');
+  const [formErrors, setFormErrors] = useState<{ [k: string]: string }>({});
 
   // Helper: sanitize to a valid subdomain label (RFC 1034/1123-ish)
   const toSubdomain = (raw: string) => {
@@ -50,33 +52,80 @@ const TenantsList: React.FC = () => {
     return s;
   };
 
+  // Check subdomain availability (debounced)
   useEffect(() => {
+    const s = form.subdomain;
+    if (!s) { setSubdomainStatus('invalid'); return; }
+    const isValid = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(s) && s.length >= 3 && s.length <= 63;
+    if (!isValid) { setSubdomainStatus('invalid'); return; }
+    setSubdomainStatus('checking');
+    const t = setTimeout(async () => {
+      try {
+        const { data } = await superadminApi.checkSubdomain(s);
+        setSubdomainStatus(data.available ? 'available' : 'taken');
+      } catch { setSubdomainStatus('invalid'); }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [form.subdomain]);
+
+  const isCreateDisabled = () => {
+    const errs: { [k: string]: string } = {};
+    if (!form.name.trim()) errs.name = 'Requerido';
+    if (!form.adminEmail.trim() || !/\S+@\S+\.\S+/.test(form.adminEmail)) errs.adminEmail = 'Email inválido';
+    if (subdomainStatus !== 'available') errs.subdomain = 'Subdominio inválido o en uso';
+    setFormErrors(errs);
+    return Object.keys(errs).length > 0;
+  };
+
+  useEffect(() => {
+    // Debug: confirm mount
+    try { console.debug('[TenantsList] mount'); } catch {}
     const token = localStorage.getItem('superadmin_token');
     if (!token) {
       navigate('/superadmin/login', { replace: true });
       return;
     }
+    // abrir modal si ?create=1
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('create') === '1') setOpenCreate(true);
+    } catch {}
     load();
   }, [navigate]);
 
   const load = async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data } = await superadminApi.getTenants();
       setItems(data.data || []);
+    } catch (err: any) {
+      console.error('Error cargando empresas (tenants):', err);
+      setError(err?.response?.data?.message || 'No se pudieron cargar las empresas');
+      setItems([]);
     } finally { setLoading(false); }
   };
 
   const submitCreate = async () => {
+    // Validar antes de enviar
+    if (isCreateDisabled()) return;
     await superadminApi.createTenant(form);
     setOpenCreate(false);
-    params.delete('create');
-    setParams(params, { replace: true });
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('create');
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
     await load();
   };
 
   return (
     <Box>
+      {error && (
+        <Box mb={2} sx={{ color: '#b71c1c', background: '#ffebee', border: '1px solid #ffcdd2', borderRadius: 1, p: 2 }}>
+          <Typography variant="body2">{error}</Typography>
+        </Box>
+      )}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700 }}>Empresas</Typography>
         <Box display="flex" gap={1}>
@@ -105,7 +154,14 @@ const TenantsList: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {(showPendingOnly ? items.filter(x => !x.isActive) : items).map(t => (
+              {loading && (
+                <TableRow>
+                  <TableCell colSpan={11}>
+                    <Typography variant="body2" color="text.secondary">Cargando empresas…</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+              {!loading && (showPendingOnly ? items.filter(x => !x.isActive) : items).map(t => (
                 <TableRow key={t.id} hover>
                   <TableCell>{t.name}</TableCell>
                   <TableCell>{t.subdomain}</TableCell>
@@ -153,9 +209,9 @@ const TenantsList: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {!loading && items.length === 0 && (
+              {!loading && items.length === 0 && !error && (
                 <TableRow>
-                  <TableCell colSpan={6}>No hay empresas</TableCell>
+                  <TableCell colSpan={11}>No hay empresas</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -178,6 +234,8 @@ const TenantsList: React.FC = () => {
                   subdomain: subdomainTouched ? prev.subdomain : toSubdomain(name),
                 }));
               }} 
+              error={!!formErrors.name}
+              helperText={formErrors.name}
               fullWidth 
             />
             <TextField 
@@ -188,19 +246,24 @@ const TenantsList: React.FC = () => {
                 setSubdomainTouched(true);
                 setForm((prev: FormState) => ({ ...prev, subdomain: sanitized }));
               }}
-              helperText="Solo letras, números y guiones; máx. 63 caracteres"
+              error={subdomainStatus === 'invalid' || subdomainStatus === 'taken'}
+              helperText={
+                subdomainStatus === 'checking' ? 'Verificando disponibilidad…' :
+                subdomainStatus === 'taken' ? 'Ya está en uso' :
+                'Solo letras, números y guiones; 3-63 caracteres'
+              }
               fullWidth 
             />
             <TextField label="País" value={form.country} onChange={e => setForm({ ...form, country: e.target.value })} fullWidth />
-            <TextField label="Código País" value={form.countryCode} onChange={e => setForm({ ...form, countryCode: e.target.value })} fullWidth />
-            <TextField label="Moneda" value={form.currency} onChange={e => setForm({ ...form, currency: e.target.value })} fullWidth />
-            <TextField label="Símbolo" value={form.currencySymbol} onChange={e => setForm({ ...form, currencySymbol: e.target.value })} fullWidth />
-            <TextField label="Email Admin" value={form.adminEmail} onChange={e => setForm({ ...form, adminEmail: e.target.value })} fullWidth />
+            <TextField label="Código País" value={form.countryCode} onChange={e => setForm({ ...form, countryCode: e.target.value.toUpperCase() })} inputProps={{ maxLength: 2 }} helperText="Ej: HN, GT, MX, DO, SV" fullWidth />
+            <TextField label="Moneda" value={form.currency} onChange={e => setForm({ ...form, currency: e.target.value.toUpperCase() })} inputProps={{ maxLength: 3 }} helperText="Ej: USD, HNL, GTQ, MXN, DOP, SVC" fullWidth />
+            <TextField label="Símbolo" value={form.currencySymbol} onChange={e => setForm({ ...form, currencySymbol: e.target.value })} inputProps={{ maxLength: 3 }} fullWidth />
+            <TextField label="Email Admin" value={form.adminEmail} onChange={e => setForm({ ...form, adminEmail: e.target.value })} error={!!formErrors.adminEmail} helperText={formErrors.adminEmail} fullWidth />
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenCreate(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={submitCreate}>Crear</Button>
+          <Button variant="contained" onClick={submitCreate} disabled={isCreateDisabled()}>Crear</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -24,6 +24,7 @@ const ProductForm: React.FC = () => {
     isActive: true,
   });
   const [images, setImages] = useState<ProductImage[]>([]);
+  const [imageError, setImageError] = useState<string>('');
 
   useEffect(() => {
     let cancelled = false;
@@ -105,7 +106,21 @@ const ProductForm: React.FC = () => {
     if (!isEdit || !id) return;
     const file = e.target.files?.[0];
     if (!file) return;
+    // Validación de tamaño y tipo en frontend
+    const MAX_MB = 5;
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.type)) {
+      setImageError('Formato inválido. Usa JPG, PNG o WEBP.');
+      (e.target as HTMLInputElement).value = '';
+      return;
+    }
+    if (file.size > MAX_MB * 1024 * 1024) {
+      setImageError(`La imagen excede ${MAX_MB}MB.`);
+      (e.target as HTMLInputElement).value = '';
+      return;
+    }
     try {
+      setImageError('');
       const { data } = await imagesApi.upload(file);
       const url = (data as any).data as string;
       const first = images.length === 0;
@@ -178,10 +193,15 @@ const ProductForm: React.FC = () => {
                   </Box>
                 ))}
               </Box>
-              <DrokexButton component="label" variant="outline">
-                Subir Imagen
-                <input type="file" accept="image/*" hidden onChange={handleFileChange} />
-              </DrokexButton>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <DrokexButton component="label" variant="outline">
+                  Subir Imagen
+                  <input type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={handleFileChange} />
+                </DrokexButton>
+                {imageError && (
+                  <Typography variant="body2" color="error">{imageError}</Typography>
+                )}
+              </Box>
             </Grid>
           )}
         </Grid>

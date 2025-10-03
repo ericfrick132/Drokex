@@ -38,13 +38,7 @@ const Login: React.FC = () => {
 
   const from = location.state?.from?.pathname || '/dashboard';
 
-  // Redirigir a SuperAdmin si corresponde; tenant se resuelve por subdominio
-  useEffect(() => {
-    try {
-      const sat = localStorage.getItem('superadmin_token');
-      if (sat) navigate('/superadmin/dashboard', { replace: true });
-    } catch {}
-  }, [navigate]);
+  // Nota: ya no redirigimos a SuperAdmin automáticamente desde /login
 
   // Prefill demo credentials (tenant resuelto por subdominio)
   useEffect(() => {
@@ -238,7 +232,7 @@ const Login: React.FC = () => {
                   ¿No tienes una cuenta?{' '}
                   <Link
                     component={RouterLink}
-                    to="/register"
+                    to="/register-choice"
                     sx={{
                       color: drokexColors.primary,
                       textDecoration: 'none',

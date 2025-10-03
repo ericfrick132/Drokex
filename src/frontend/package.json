@@ -24,7 +24,7 @@
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
-    "gsap": "^3.12.5"
+    "react-bits": "github:DavidHDev/react-bits"
   },
   "scripts": {
     "start": "react-scripts start",

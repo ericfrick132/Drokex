@@ -44,6 +44,9 @@ const PublicNavbar: React.FC = () => {
           <Link href="#beneficios" sx={linkSx}>
             Beneficios
           </Link>
+          <Link href="/catalog" sx={linkSx}>
+            Buscar Proveedores
+          </Link>
         </Box>
 
         {/* Right actions */}
@@ -61,7 +64,7 @@ const PublicNavbar: React.FC = () => {
           </Button>
           <Button
             variant="contained"
-            onClick={() => navigate('/register')}
+            onClick={() => navigate('/register-choice')}
             sx={{
               backgroundColor: drokexColors.primary,
               color: drokexColors.dark,
@@ -78,4 +81,3 @@ const PublicNavbar: React.FC = () => {
 };
 
 export default PublicNavbar;
-

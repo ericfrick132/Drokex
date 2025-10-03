@@ -1,13 +1,12 @@
 import React from 'react';
 import { AppBar, Toolbar, Box, IconButton, Button, Typography, Container, Menu, MenuItem } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 import { Dashboard, Domain, Group, Logout } from '@mui/icons-material';
 import { drokexColors } from '../../theme/drokexTheme';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DrokexLogo } from '../common';
 
-interface Props { children: React.ReactNode }
-
-const SuperAdminLayout: React.FC<Props> = ({ children }) => {
+const SuperAdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -53,7 +52,7 @@ const SuperAdminLayout: React.FC<Props> = ({ children }) => {
         </Toolbar>
       </AppBar>
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {children}
+        <Outlet />
       </Container>
     </Box>
   );

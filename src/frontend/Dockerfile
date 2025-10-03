@@ -4,7 +4,9 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-RUN npm install
+# Install git for GitHub deps (react-bits)
+RUN apk add --no-cache git \
+    && npm install
 
 # Copy source code and build
 COPY src ./src

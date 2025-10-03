@@ -15,7 +15,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out ./
 
-# Create a non-root user
+# Create a non-root user (no extra packages)
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
 USER appuser
 

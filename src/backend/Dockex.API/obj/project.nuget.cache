@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "P6Bzby7CNFGcY1vtBczoH+e45Sblp/bdN5eiuQ2AjuGpOwq6u1Fr66KrAwF5LLFaw+cBJVniBAvHehhFr4M2Tg==",
+  "dgSpecHash": "KsBxk/KMlmFQtfgx/9MGiFsS30eH9h+3V3hHjwmQE9Thmn5fLrjlnR/kJxeUR5c47plEPlqzBk349fxZs00syw==",
   "success": true,
-  "projectFilePath": "D:\\code\\efcloud\\projects\\Drokex\\src\\backend\\Dockex.API\\Dockex.API.csproj",
+  "projectFilePath": "D:\\code\\efcloud\\projects\\CLIENTS\\Drokex\\src\\backend\\Dockex.API\\Dockex.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\EricFrick\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\EricFrick\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

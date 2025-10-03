@@ -112,6 +112,17 @@ public class TenantResolutionMiddleware
             }
         }
 
+        // Desarrollo: subdomain.localhost
+        if (parts.Length >= 2 && parts[^1] == "localhost")
+        {
+            var subdomain = parts[0];
+            var systemSubdomains = new[] { "www", "api", "admin", "app" };
+            if (!systemSubdomains.Contains(subdomain.ToLower()))
+            {
+                return subdomain;
+            }
+        }
+
         return null;
     }
 
