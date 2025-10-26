@@ -18,8 +18,10 @@ RUN npm run build
 FROM nginx:alpine AS runtime
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy nginx template and entrypoint for env-based proxy config
+COPY nginx.template.conf /etc/nginx/nginx.template.conf
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 EXPOSE 3000
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/docker-entrypoint.sh"]

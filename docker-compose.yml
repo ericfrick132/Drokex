@@ -29,6 +29,7 @@ services:
       - drokex-api
     environment:
       - REACT_APP_API_URL=/api
+      - API_UPSTREAM=http://drokex-api:5000
       - REACT_APP_MULTI_TENANT=true
       - REACT_APP_BRAND_NAME=Drokex
       - REACT_APP_PRIMARY_COLOR=#abd305
