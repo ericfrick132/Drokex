@@ -6,25 +6,33 @@ public static class ConfigurationHelper
 {
     public static string GetConnectionString(IConfiguration configuration)
     {
+        // Preferir DATABASE_URL en entornos gestionados (DO, Heroku, etc.)
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        if (!string.IsNullOrWhiteSpace(databaseUrl))
+        {
+            try { Console.WriteLine("DB Config: Using DATABASE_URL"); } catch { }
+            if (databaseUrl.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+                databaseUrl.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+            {
+                return ConvertPostgreSqlUrlToConnectionString(databaseUrl);
+            }
+            return databaseUrl;
+        }
+
+        // Fallback: ConnectionStrings:DefaultConnection (appsettings o env ConnectionStrings__DefaultConnection)
         var connectionString = configuration.GetConnectionString("DefaultConnection");
-        
-        if (string.IsNullOrEmpty(connectionString))
+        if (!string.IsNullOrWhiteSpace(connectionString))
         {
-            connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+            try { Console.WriteLine("DB Config: Using ConnectionStrings:DefaultConnection"); } catch { }
+            if (connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) ||
+                connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+            {
+                return ConvertPostgreSqlUrlToConnectionString(connectionString);
+            }
+            return connectionString;
         }
-        
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new InvalidOperationException("No database connection string found. Check CONNECTION_STRINGS:DefaultConnection or DATABASE_URL environment variable.");
-        }
-        
-        // Si es una URL de PostgreSQL, convertirla al formato de connection string
-        if (connectionString.StartsWith("postgres://") || connectionString.StartsWith("postgresql://"))
-        {
-            return ConvertPostgreSqlUrlToConnectionString(connectionString);
-        }
-        
-        return connectionString;
+
+        throw new InvalidOperationException("No database connection string found. Set DATABASE_URL or ConnectionStrings:DefaultConnection.");
     }
     
     private static string ConvertPostgreSqlUrlToConnectionString(string databaseUrl)
