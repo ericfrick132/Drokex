@@ -284,24 +284,29 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
       }
     } catch {}
 
-    const detectTenantFromUrl = () => {
-      // Detectar desde subdomain (prod: sub.drokex.com; dev: sub.localhost)
-      const hostname = window.location.hostname;
-      const parts = hostname.split('.');
-      if (
-        (parts.length >= 3 && parts[1] === 'drokex' && parts[2] === 'com') ||
-        (parts.length >= 2 && parts[parts.length - 1] === 'localhost')
-      ) {
-        const subdomain = parts[0];
-        if (!['www', 'api', 'admin', 'app'].includes(subdomain)) {
-          // Sólo usamos el subdominio para llamadas
-          console.log(`🌎 Subdomain detectado: ${subdomain}`);
+    const getSubdomain = (): string | null => {
+      try {
+        const hostname = window.location.hostname.toLowerCase();
+        const parts = hostname.split('.');
+        // prod: sub.drokex.com; dev: sub.localhost
+        const isProdPattern = parts.length >= 3 && parts[parts.length - 2] === 'drokex' && parts[parts.length - 1] === 'com';
+        const isDevPattern = parts.length >= 2 && parts[parts.length - 1] === 'localhost';
+        if (isProdPattern || isDevPattern) {
+          const sub = parts[0];
+          if (!['www', 'api', 'admin', 'app'].includes(sub)) return sub;
         }
-      }
+      } catch {}
+      return null;
     };
 
-    detectTenantFromUrl();
-    loadTenant();
+    const sub = getSubdomain();
+    if (sub) {
+      console.log(`🌎 Subdomain detectado: ${sub}`);
+      loadTenant();
+    } else {
+      // Sin subdominio (ej: drokex.com): no bloquear la landing
+      setIsLoading(false);
+    }
   }, []);
 
   // Valores del contexto
