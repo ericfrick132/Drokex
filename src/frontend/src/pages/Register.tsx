@@ -910,6 +910,7 @@ const Register: React.FC = () => {
             </Typography>
           </Box>
         </Box>
+        </Box>
         <PublicFooter />
       </Box>
     </DrokexPattern>
