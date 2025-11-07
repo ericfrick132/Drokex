@@ -42,6 +42,7 @@ import {
 } from '../components/common';
 import { drokexColors } from '../theme/drokexTheme';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import PublicFooter from '../components/layout/PublicFooter';
 import BitsReveal from '../components/bits/BitsReveal';
 import BitsParallax from '../components/bits/BitsParallax';
 import BitsTilt from '../components/bits/BitsTilt';
@@ -631,41 +632,7 @@ const LandingPage: React.FC = () => {
         </Container>
       </DrokexPattern>
 
-      {/* Footer */}
-      <Box sx={{ backgroundColor: drokexColors.dark, py: 6 }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center' }}>
-            <DrokexLogo variant="full" size="medium" color="white" withMargin={false} />
-            
-            <Typography
-              variant="body2"
-              sx={{ mt: 2, mb: 3, color: 'rgba(255, 255, 255, 0.8)' }}
-            >
-              Conectando empresas de LATAM con compradores internacionales
-            </Typography>
-
-            {tenant && (
-              <Box sx={{ mb: 3 }}>
-                <Chip
-                  label={`${tenant.name}${tenant.country ? ` • ${tenant.country}` : ''}`}
-                  sx={{
-                    backgroundColor: drokexColors.primary,
-                    color: drokexColors.dark,
-                    fontWeight: 600,
-                  }}
-                />
-              </Box>
-            )}
-
-            <Typography
-              variant="caption"
-              sx={{ color: 'rgba(255, 255, 255, 0.6)' }}
-            >
-              © 2025 Drokex. Todos los derechos reservados.
-            </Typography>
-          </Box>
-        </Container>
-      </Box>
+      <PublicFooter />
     </Box>
   );
 };

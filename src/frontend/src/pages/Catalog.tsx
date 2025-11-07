@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Container, Grid, Typography, TextField, InputAdornment, IconButton, Select, MenuItem, FormControl, InputLabel, Pagination } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import PublicFooter from '../components/layout/PublicFooter';
 import { DrokexCard, DrokexCardContent, DrokexButton, DrokexPattern } from '../components/common';
 import { catalogApi } from '../services/api';
 import { Category, Product } from '../types';
@@ -163,6 +164,7 @@ const Catalog: React.FC = () => {
             <Pagination count={totalPages} page={page} onChange={(_, p) => setPage(p)} color="primary" />
           </Box>
         </Container>
+        <PublicFooter />
       </Box>
     </DrokexPattern>
   );

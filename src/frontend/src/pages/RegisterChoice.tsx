@@ -4,6 +4,7 @@ import { DrokexPattern, DrokexCard, DrokexCardContent, DrokexButton, DrokexLogo 
 import { drokexColors } from '../theme/drokexTheme';
 import { Storefront, Search as SearchIcon } from '@mui/icons-material';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import PublicFooter from '../components/layout/PublicFooter';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterChoice: React.FC = () => {
@@ -11,8 +12,9 @@ const RegisterChoice: React.FC = () => {
 
   return (
     <DrokexPattern pattern="diagonal" opacity={0.03}>
-      <Box sx={{ minHeight: '100vh', backgroundColor: drokexColors.light }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: drokexColors.light }}>
         <PublicNavbar />
+        <Box sx={{ flex: 1 }}>
         <Container maxWidth="lg" sx={{ py: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 5 }}>
             <DrokexLogo variant="full" size="large" color="primary" />
@@ -68,10 +70,11 @@ const RegisterChoice: React.FC = () => {
             </Grid>
           </Grid>
         </Container>
+        </Box>
+        <PublicFooter />
       </Box>
     </DrokexPattern>
   );
 };
 
 export default RegisterChoice;
-

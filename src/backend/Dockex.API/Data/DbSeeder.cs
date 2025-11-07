@@ -21,6 +21,19 @@ public class DbSeeder
             // Crear la base de datos si no existe
             await _context.Database.EnsureCreatedAsync();
 
+            // Seed default BusinessTypes if none
+            if (!await _context.BusinessTypes.AnyAsync())
+            {
+                _logger.LogInformation("Seeding default BusinessTypes");
+                var defaults = new[] { "Fabricante", "Exportador", "Distribuidor", "Mayorista", "Minorista", "Importador", "Proveedor de servicios", "Artesano/Hecho a mano", "Cooperativa", "Otro" };
+                int order = 0;
+                foreach (var name in defaults)
+                {
+                    _context.BusinessTypes.Add(new BusinessType { Name = name, DisplayOrder = order++, IsActive = true, CreatedAt = DateTime.UtcNow });
+                }
+                await _context.SaveChangesAsync();
+            }
+
             // Asegurar tenants por defecto si no existen (cuando no hay migraciones)
             if (!await _context.Tenants.AnyAsync())
             {

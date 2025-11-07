@@ -17,14 +17,7 @@ const PublicNavbar: React.FC = () => {
   } as const;
 
   return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      sx={{
-        backgroundColor: drokexColors.dark,
-        borderBottom: `1px solid rgba(255,255,255,0.08)`,
-      }}
-    >
+    <AppBar position="sticky" elevation={0} sx={{ backgroundColor: drokexColors.dark, borderBottom: `1px solid rgba(255,255,255,0.08)`, position: 'relative' }}>
       <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center' }}>
         {/* Brand */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -45,7 +38,10 @@ const PublicNavbar: React.FC = () => {
             Beneficios
           </Link>
           <Link href="/catalog" sx={linkSx}>
-            Buscar Proveedores
+            Productos
+          </Link>
+          <Link href="/companies" sx={linkSx}>
+            Directorio
           </Link>
         </Box>
 
@@ -76,6 +72,8 @@ const PublicNavbar: React.FC = () => {
           </Button>
         </Box>
       </Toolbar>
+      {/* Brand strength stripe */}
+      <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${drokexColors.primary}, ${drokexColors.secondary})` }} />
     </AppBar>
   );
 };

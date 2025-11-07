@@ -16,12 +16,17 @@ import {
   ExitToApp, 
   Dashboard,
   Business,
-  Inventory
+  Inventory,
+  Menu as MenuIcon,
+  Home,
+  Storefront,
 } from '@mui/icons-material';
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTenant } from '../../contexts/TenantContext';
 import { useNavigate } from 'react-router-dom';
 import { DrokexLogo } from '../common';
+import PublicFooter from './PublicFooter';
 import { drokexColors } from '../../theme/drokexTheme';
 
 interface AppLayoutProps {
@@ -33,6 +38,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   const { tenant } = useTenant();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -64,6 +70,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         }}
       >
         <Toolbar>
+          {/* Hamburger */}
+          <IconButton color="inherit" edge="start" onClick={() => setDrawerOpen(true)} sx={{ mr: 1, display: { xs: 'inline-flex', md: 'inline-flex' } }} aria-label="menú">
+            <MenuIcon />
+          </IconButton>
           {/* Logo */}
           <Box 
             onClick={() => navigate('/dashboard')}
@@ -178,7 +188,43 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </Box>
           )}
         </Toolbar>
+        {/* Brand strength stripe */}
+        <Box sx={{ height: 3, background: `linear-gradient(90deg, ${drokexColors.primary}, ${drokexColors.secondary})` }} />
       </AppBar>
+
+      {/* Drawer navigation */}
+      <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Box sx={{ width: 260 }} role="presentation" onClick={() => setDrawerOpen(false)} onKeyDown={() => setDrawerOpen(false)}>
+          <List>
+            <ListItemButton onClick={() => navigate('/dashboard')}>
+              <ListItemIcon><Home sx={{ color: drokexColors.secondary }} /></ListItemIcon>
+              <ListItemText primary="Inicio" />
+            </ListItemButton>
+            <ListItemButton onClick={() => navigate('/products')}>
+              <ListItemIcon><Inventory sx={{ color: drokexColors.secondary }} /></ListItemIcon>
+              <ListItemText primary="Mis Productos" />
+            </ListItemButton>
+            {user?.companyId && (
+              <ListItemButton onClick={() => navigate('/company')}>
+                <ListItemIcon><Business sx={{ color: drokexColors.secondary }} /></ListItemIcon>
+                <ListItemText primary="Mi Empresa" />
+              </ListItemButton>
+            )}
+            <ListItemButton onClick={() => navigate('/catalog')}>
+              <ListItemIcon><Storefront sx={{ color: drokexColors.secondary }} /></ListItemIcon>
+              <ListItemText primary="Catálogo" />
+            </ListItemButton>
+            <ListItemButton onClick={() => navigate('/profile')}>
+              <ListItemIcon><AccountCircle sx={{ color: drokexColors.secondary }} /></ListItemIcon>
+              <ListItemText primary="Mi Perfil" />
+            </ListItemButton>
+            <ListItemButton onClick={handleLogout}>
+              <ListItemIcon><ExitToApp sx={{ color: '#d32f2f' }} /></ListItemIcon>
+              <ListItemText primary="Cerrar Sesión" />
+            </ListItemButton>
+          </List>
+        </Box>
+      </Drawer>
 
       {/* Main Content */}
       <Box 
@@ -193,6 +239,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           {children}
         </Container>
       </Box>
+
+      {/* Global footer */}
+      <PublicFooter />
     </Box>
   );
 };

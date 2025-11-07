@@ -7,7 +7,7 @@ namespace Dockex.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CatalogController : ControllerBase
+    public class CatalogController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<CatalogController> _logger;
@@ -25,6 +25,25 @@ public class CatalogController : ControllerBase
     {
         var day = DateTime.UtcNow.ToString("yyyyMMdd");
         return $"{day}:{productId}";
+    }
+
+    [HttpGet("business-types")]
+    public async Task<ActionResult<ApiResponseDto<List<BusinessTypeDto>>>> GetBusinessTypes()
+    {
+        try
+        {
+            var list = await _context.BusinessTypes
+                .Where(b => b.IsActive)
+                .OrderBy(b => b.DisplayOrder).ThenBy(b => b.Name)
+                .Select(b => new BusinessTypeDto { Id = b.Id, Name = b.Name, Description = b.Description })
+                .ToListAsync();
+            return Ok(new ApiResponseDto<List<BusinessTypeDto>>(list));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving business types");
+            return StatusCode(500, new ApiResponseDto<List<BusinessTypeDto>>("Internal server error"));
+        }
     }
 
     [HttpPost("products/{id}/view")]
@@ -73,9 +92,14 @@ public class CatalogController : ControllerBase
             // Apply search filters
             if (!string.IsNullOrEmpty(searchDto.Search))
             {
-                query = query.Where(p => p.Name.Contains(searchDto.Search) || 
-                                       p.Description.Contains(searchDto.Search) ||
-                                       p.Company.Name.Contains(searchDto.Search));
+                var term = searchDto.Search.ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(term) ||
+                    p.Description.ToLower().Contains(term) ||
+                    p.Company.Name.ToLower().Contains(term) ||
+                    (p.Category != null && p.Category.Name.ToLower().Contains(term)) ||
+                    (!string.IsNullOrEmpty(p.HsCode) && p.HsCode!.ToLower().Contains(term))
+                );
             }
 
             if (searchDto.CategoryId.HasValue)
@@ -346,4 +370,11 @@ public class CategoryDto
     public int? ParentCategoryId { get; set; }
     public int DisplayOrder { get; set; }
     public int ProductsCount { get; set; }
+}
+
+public class BusinessTypeDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? Description { get; set; }
 }

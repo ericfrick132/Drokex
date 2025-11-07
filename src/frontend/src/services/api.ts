@@ -192,6 +192,8 @@ export const catalogApi = {
   
   getFeaturedProducts: (take = 8): Promise<AxiosResponse<ApiResponse<Product[]>>> => 
     apiClient.get('/catalog/featured-products', { params: { take } }),
+  getBusinessTypes: (): Promise<AxiosResponse<ApiResponse<{ id: number; name: string; description?: string }[]>>> =>
+    apiClient.get('/catalog/business-types'),
 };
 
 // Leads API
@@ -210,6 +212,12 @@ export const leadsApi = {
   
   deleteLead: (id: number): Promise<AxiosResponse<ApiResponse<boolean>>> => 
     apiClient.delete(`/leads/${id}`),
+};
+
+// Categories Admin API
+export const categoriesApi = {
+  create: (data: { name: string; description?: string; displayOrder?: number; parentCategoryId?: number }) =>
+    apiClient.post('/categories', data),
 };
 
 // Tenants API (Admin/General)

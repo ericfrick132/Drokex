@@ -40,6 +40,14 @@ export const superadminApi = {
   // Impersonation
   impersonate: (tenantId: number, userEmail?: string, userId?: number) => 
     superAdminClient.post('/superadmin/impersonate', { tenantId, userEmail, userId }),
+
+  // Business Types
+  getBusinessTypes: () => superAdminClient.get('/superadmin/business-types'),
+  createBusinessType: (data: { name: string; description?: string; displayOrder?: number; isActive?: boolean }) =>
+    superAdminClient.post('/superadmin/business-types', data),
+  updateBusinessType: (id: number, data: { name?: string; description?: string; displayOrder?: number; isActive?: boolean }) =>
+    superAdminClient.put(`/superadmin/business-types/${id}`, data),
+  deleteBusinessType: (id: number) => superAdminClient.delete(`/superadmin/business-types/${id}`),
 };
 
 export default superadminApi;

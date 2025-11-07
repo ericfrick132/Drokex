@@ -24,6 +24,7 @@ import {
 import { drokexColors } from '../theme/drokexTheme';
 import { Email, Lock } from '@mui/icons-material';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import PublicFooter from '../components/layout/PublicFooter';
 
 const Login: React.FC = () => {
   // Prefill for demo based on DbSeeder
@@ -102,29 +103,16 @@ const Login: React.FC = () => {
 
   return (
     <DrokexPattern pattern="diagonal" opacity={0.03}>
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: drokexColors.light,
-          padding: '2rem 1rem',
-        }}
-      >
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: drokexColors.light }}>
         {/* Public Navbar */}
-        <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0 }}>
+        <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10 }}>
           <PublicNavbar />
         </Box>
-        <Box sx={{ height: 56, position: 'absolute', top: 0 }} />
-        <DrokexCard 
-          variant="elevated" 
-          sx={{ 
-            width: '100%', 
-            maxWidth: 400,
-            overflow: 'visible'
-          }}
-        >
+        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2, pt: 8 }}>
+          <DrokexCard 
+            variant="elevated" 
+            sx={{ width: '100%', maxWidth: 400, overflow: 'visible' }}
+          >
           <DrokexCardContent>
             {/* Logo y Titulo */}
             <Box sx={{ textAlign: 'center', mb: 3 }}>
@@ -248,28 +236,10 @@ const Login: React.FC = () => {
               </Box>
             </Box>
           </DrokexCardContent>
-        </DrokexCard>
-
-        {/* Footer */}
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: 16,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            textAlign: 'center',
-          }}
-        >
-          <Typography 
-            variant="caption" 
-            sx={{ 
-              color: drokexColors.secondary,
-              fontSize: '0.7rem',
-            }}
-          >
-            🚀 Drokex - Connecting LATAM Businesses
-          </Typography>
+          </DrokexCard>
         </Box>
+
+        <PublicFooter />
       </Box>
     </DrokexPattern>
   );

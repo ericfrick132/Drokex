@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Box, IconButton, Button, Typography, Container, Menu, MenuItem } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import { Dashboard, Domain, Group, Logout } from '@mui/icons-material';
+import { Dashboard, Domain, Group, Logout, Store } from '@mui/icons-material';
 import { drokexColors } from '../../theme/drokexTheme';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DrokexLogo } from '../common';
@@ -44,6 +44,7 @@ const SuperAdminLayout: React.FC = () => {
           <NavButton label="Dashboard" to="/superadmin/dashboard" icon={<Dashboard />} />
           <NavButton label="Empresas" to="/superadmin/tenants" icon={<Domain />} />
           <NavButton label="Usuarios" to="/superadmin/users" icon={<Group />} />
+          <NavButton label="Tipos de Negocio" to="/superadmin/business-types" icon={<Store />} />
           <Box sx={{ ml: 'auto' }}>
             <IconButton color="inherit" onClick={logout} title="Salir">
               <Logout />

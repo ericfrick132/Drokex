@@ -3,6 +3,7 @@ import { Box, Container, Grid, Typography, Alert, Link, FormControlLabel, Checkb
 import { DrokexPattern, DrokexCard, DrokexCardContent, DrokexInput, DrokexButton, DrokexLogo } from '../components/common';
 import { drokexColors } from '../theme/drokexTheme';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import PublicFooter from '../components/layout/PublicFooter';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useTenant } from '../contexts/TenantContext';
@@ -59,8 +60,9 @@ const Signup: React.FC = () => {
 
   return (
     <DrokexPattern pattern="diagonal" opacity={0.03}>
-      <Box sx={{ minHeight: '100vh', backgroundColor: drokexColors.light }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: drokexColors.light }}>
         <PublicNavbar />
+        <Box sx={{ flex: 1 }}>
         <Container maxWidth="sm" sx={{ py: 6 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>
             <DrokexLogo variant="full" size="large" color="primary" />
@@ -200,10 +202,11 @@ const Signup: React.FC = () => {
             </Typography>
           </Box>
         </Container>
+        </Box>
+        <PublicFooter />
       </Box>
     </DrokexPattern>
   );
 };
 
 export default Signup;
-

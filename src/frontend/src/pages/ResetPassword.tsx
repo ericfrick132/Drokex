@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import { DrokexPattern, DrokexCard, DrokexCardContent, DrokexInput, DrokexButton, DrokexLogo } from '../components/common';
+import PublicFooter from '../components/layout/PublicFooter';
 import { drokexColors } from '../theme/drokexTheme';
 import apiClient from '../services/api';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -36,8 +37,9 @@ const ResetPassword: React.FC = () => {
 
   return (
     <DrokexPattern pattern="diagonal" opacity={0.03}>
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: drokexColors.light, p: 2 }}>
-        <DrokexCard variant="elevated" sx={{ width: '100%', maxWidth: 420 }}>
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: drokexColors.light }}>
+        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+          <DrokexCard variant="elevated" sx={{ width: '100%', maxWidth: 420 }}>
           <DrokexCardContent>
             <Box sx={{ textAlign: 'center', mb: 2 }}>
               <DrokexLogo variant="full" size="large" color="primary" />
@@ -58,11 +60,12 @@ const ResetPassword: React.FC = () => {
               </Box>
             </Box>
           </DrokexCardContent>
-        </DrokexCard>
+          </DrokexCard>
+        </Box>
+        <PublicFooter />
       </Box>
     </DrokexPattern>
   );
 };
 
 export default ResetPassword;
-

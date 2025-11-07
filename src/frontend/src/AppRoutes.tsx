@@ -16,6 +16,8 @@ import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
 import Catalog from './pages/Catalog';
 import ProductDetail from './pages/ProductDetail';
+import Companies from './pages/Companies';
+import CompanyPublic from './pages/CompanyPublic';
 import Products from './pages/Products';
 import ProductForm from './pages/ProductForm';
 import AdminCompaniesPending from './pages/AdminCompaniesPending';
@@ -40,6 +42,7 @@ import TenantsList from './pages/SuperAdmin/TenantsList';
 import TenantDetail from './pages/SuperAdmin/TenantDetail';
 import UsersList from './pages/SuperAdmin/UsersList';
 import LandingCMS from './pages/SuperAdmin/LandingCMS';
+import BusinessTypes from './pages/SuperAdmin/BusinessTypes';
 // import Products from './pages/Products';
 // import Company from './pages/Company';
 // import AdminPanel from './pages/AdminPanel';
@@ -161,6 +164,8 @@ const MainRoutesInner: React.FC = () => (
 
       <Route path="/catalog" element={<Catalog />} />
       <Route path="/catalog/:id" element={<ProductDetail />} />
+      <Route path="/companies" element={<Companies />} />
+      <Route path="/companies/:id" element={<CompanyPublic />} />
 
       {/* Rutas protegidas con layout */}
       <Route
@@ -407,6 +412,7 @@ const SuperAdminRoutes: React.FC = () => (
       <Route path="empresas/:id" element={<TenantDetail />} />
       <Route path="users" element={<UsersList />} />
       <Route path="landing" element={<LandingCMS />} />
+      <Route path="business-types" element={<BusinessTypes />} />
     </Route>
   </Routes>
 );

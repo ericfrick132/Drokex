@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Container, Grid, Typography, Chip } from '@mui/material';
+import { Box, Container, Grid, Typography, Chip, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import PublicNavbar from '../components/layout/PublicNavbar';
+import PublicFooter from '../components/layout/PublicFooter';
 import { DrokexCard, DrokexCardContent, DrokexButton, DrokexPattern } from '../components/common';
-import { catalogApi, productsApi } from '../services/api';
+import { catalogApi, productsApi, leadsApi } from '../services/api';
 import { Product } from '../types';
 import { drokexColors } from '../theme/drokexTheme';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,6 +16,12 @@ const ProductDetail: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const { user } = useAuth();
+  const [chatOpen, setChatOpen] = useState(false);
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -133,7 +140,13 @@ const ProductDetail: React.FC = () => {
                       Email: {product.companyContactEmail} • Tel: {product.companyPhone}
                     </Typography>
                     <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      <DrokexButton variant="primary">Contactar</DrokexButton>
+                      <DrokexButton variant="primary" onClick={() => {
+                        setContactName(user ? `${user.firstName} ${user.lastName}` : '');
+                        setContactEmail(user?.email || '');
+                        setContactPhone('');
+                        setMessage('Hola, estoy interesado en este producto.');
+                        setChatOpen(true);
+                      }}>Contactar</DrokexButton>
                       {canDelete && (
                         <DrokexButton
                           variant="outline"
@@ -151,6 +164,44 @@ const ProductDetail: React.FC = () => {
             </Grid>
           )}
         </Container>
+        {/* Contact dialog (lightweight chat) */}
+        <Dialog open={chatOpen} onClose={() => setChatOpen(false)} fullWidth maxWidth="sm">
+          <DialogTitle>Contactar a la empresa</DialogTitle>
+          <DialogContent>
+            {!user && (
+              <>
+                <TextField fullWidth margin="normal" label="Tu nombre" value={contactName} onChange={(e) => setContactName(e.target.value)} />
+                <TextField fullWidth type="email" margin="normal" label="Tu email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+                <TextField fullWidth margin="normal" label="Tu teléfono (opcional)" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
+              </>
+            )}
+            <TextField fullWidth multiline minRows={3} margin="normal" label="Mensaje" value={message} onChange={(e) => setMessage(e.target.value)} />
+            <Typography variant="caption" sx={{ color: drokexColors.secondary }}>
+              Se enviará una solicitud de contacto al proveedor (modo beta).
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <DrokexButton variant="ghost" onClick={() => setChatOpen(false)}>Cancelar</DrokexButton>
+            <DrokexButton variant="primary" loading={sending} onClick={async () => {
+              if (!product) return;
+              const payload = {
+                companyName: product.companyName,
+                contactName: contactName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Interesado',
+                email: contactEmail || user?.email || '',
+                phone: contactPhone,
+                message: message || `Interés en el producto ${product.name}`,
+              };
+              try {
+                setSending(true);
+                await leadsApi.createLead(payload);
+                setChatOpen(false);
+              } finally {
+                setSending(false);
+              }
+            }}>Enviar</DrokexButton>
+          </DialogActions>
+        </Dialog>
+        <PublicFooter />
       </Box>
     </DrokexPattern>
   );

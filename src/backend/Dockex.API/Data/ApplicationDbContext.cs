@@ -30,6 +30,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Lead> Leads { get; set; }
     public DbSet<SuperAdmin> SuperAdmins { get; set; }
     public DbSet<Activity> Activities { get; set; }
+    public DbSet<BusinessType> BusinessTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -243,6 +244,15 @@ public class ApplicationDbContext : DbContext
             {
                 entity.HasQueryFilter(l => l.TenantId == currentTenantId.Value);
             }
+        });
+
+        // BusinessType configurations (global, not tenant-scoped)
+        modelBuilder.Entity<BusinessType>(entity =>
+        {
+            entity.Property(b => b.Name).HasMaxLength(100).IsRequired();
+            entity.Property(b => b.Description).HasMaxLength(300);
+            entity.HasIndex(b => b.Name).IsUnique();
+            entity.HasIndex(b => new { b.IsActive, b.DisplayOrder });
         });
 
         // Activity configurations

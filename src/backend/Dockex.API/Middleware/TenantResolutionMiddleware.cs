@@ -77,12 +77,26 @@ public class TenantResolutionMiddleware
             }
         }
 
-        // 3. (Eliminado) No resolvemos por query parameter; usar subdominio
-
-        // 4. Fallback a tenant por defecto para desarrollo
+        // 3. Desarrollo: permitir query parameter ?tenant=subdomain para pruebas locales
         if (IsDevelopmentEnvironment(context))
         {
-            return await tenantService.GetTenantBySubdomainAsync("honduras"); // Tenant por defecto
+            var qp = context.Request.Query["tenant"].ToString();
+            if (!string.IsNullOrWhiteSpace(qp))
+            {
+                var tenantFromQuery = await tenantService.GetTenantBySubdomainAsync(qp);
+                if (tenantFromQuery != null)
+                {
+                    return tenantFromQuery;
+                }
+            }
+        }
+
+        // 4. Fallback a primer tenant activo en desarrollo (muestra seed por defecto)
+        if (IsDevelopmentEnvironment(context))
+        {
+            var all = await tenantService.GetAllTenantsAsync();
+            var first = all.FirstOrDefault();
+            if (first != null) return first;
         }
 
         return null;
