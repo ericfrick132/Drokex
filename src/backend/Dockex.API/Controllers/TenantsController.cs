@@ -18,22 +18,22 @@ namespace Dockex.API.Controllers;
     {
     }
 
-    private static (string? heroTitle, string? heroSubtitle, string? ctaText) ExtractCmsFromCustomCss(string? customCss)
+    private static (string? heroTitle, string? heroSubtitle, string? ctaText, string? heroVideoUrl, string? heroVideoPoster) ExtractCmsFromCustomCss(string? customCss)
     {
-        if (string.IsNullOrEmpty(customCss)) return (null, null, null);
+        if (string.IsNullOrEmpty(customCss)) return (null, null, null, null, null);
         var markerStart = "/*CMS:";
         var idx = customCss.IndexOf(markerStart);
-        if (idx < 0) return (null, null, null);
+        if (idx < 0) return (null, null, null, null, null);
         var endIdx = customCss.IndexOf("*/", idx + markerStart.Length);
-        if (endIdx < 0) return (null, null, null);
+        if (endIdx < 0) return (null, null, null, null, null);
         var json = customCss.Substring(idx + markerStart.Length, endIdx - (idx + markerStart.Length));
         try
         {
             var doc = System.Text.Json.JsonDocument.Parse(json);
             string? gt(string name) => doc.RootElement.TryGetProperty(name, out var p) ? p.GetString() : null;
-            return (gt("heroTitle"), gt("heroSubtitle"), gt("ctaText"));
+            return (gt("heroTitle"), gt("heroSubtitle"), gt("ctaText"), gt("heroVideoUrl"), gt("heroVideoPoster"));
         }
-        catch { return (null, null, null); }
+        catch { return (null, null, null, null, null); }
     }
 
     private static string UpsertCmsInCustomCss(string? customCss, object cms)
@@ -65,8 +65,8 @@ namespace Dockex.API.Controllers;
         if (validation != null) return validation;
         var t = await _tenantService.GetTenantByIdAsync(CurrentTenantId!.Value);
         if (t == null) return NotFound(CreateTenantErrorResponse("Tenant no encontrado"));
-        var (heroTitle, heroSubtitle, ctaText) = ExtractCmsFromCustomCss(t.CustomCss);
-        return Ok(CreateTenantResponse(new { heroTitle, heroSubtitle, ctaText }, "CMS obtenido"));
+        var (heroTitle, heroSubtitle, ctaText, heroVideoUrl, heroVideoPoster) = ExtractCmsFromCustomCss(t.CustomCss);
+        return Ok(CreateTenantResponse(new { heroTitle, heroSubtitle, ctaText, heroVideoUrl, heroVideoPoster }, "CMS obtenido"));
     }
 
     /// <summary>
@@ -80,9 +80,22 @@ namespace Dockex.API.Controllers;
         if (validation != null) return validation;
         var t = await _tenantService.GetTenantByIdAsync(CurrentTenantId!.Value);
         if (t == null) return NotFound(CreateTenantErrorResponse("Tenant no encontrado"));
-        t.CustomCss = UpsertCmsInCustomCss(t.CustomCss, new { dto.HeroTitle, dto.HeroSubtitle, dto.CtaText });
+        t.CustomCss = UpsertCmsInCustomCss(t.CustomCss, new { dto.HeroTitle, dto.HeroSubtitle, dto.CtaText, dto.HeroVideoUrl, dto.HeroVideoPoster });
         await (_tenantService as TenantService)!.UpdateTenantAsync(t);
         return Ok(CreateTenantResponse(new { success = true }, "CMS actualizado"));
+    }
+
+    /// <summary>
+    /// Países soportados para el tenant actual (para restringir selects en registro/UX)
+    /// </summary>
+    [HttpGet("supported-countries")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetSupportedCountries()
+    {
+        var validation = ValidateTenantRequired();
+        if (validation != null) return validation;
+        var list = await (_tenantService as TenantService)!.GetSupportedCountriesAsync(CurrentTenantId!.Value);
+        return Ok(CreateTenantResponse(list, "Países soportados obtenidos"));
     }
 
 
@@ -326,4 +339,6 @@ public class LandingCmsDto
     public string? HeroTitle { get; set; }
     public string? HeroSubtitle { get; set; }
     public string? CtaText { get; set; }
+    public string? HeroVideoUrl { get; set; }
+    public string? HeroVideoPoster { get; set; }
 }

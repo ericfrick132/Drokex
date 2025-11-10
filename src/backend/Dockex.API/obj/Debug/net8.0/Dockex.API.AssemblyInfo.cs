@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dockex.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+47a4b765bffc53971498135eeba4bf82febefda8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c738084c1f0778b661428ab46a609edde1454c2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dockex.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dockex.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

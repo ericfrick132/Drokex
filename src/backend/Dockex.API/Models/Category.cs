@@ -2,14 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dockex.API.Models;
 
-public class Category : IMultiTenant
+public class Category
 {
     public int Id { get; set; }
-    
-    // Multi-tenancy
-    [Required]
-    public int TenantId { get; set; }
-    public virtual Tenant Tenant { get; set; } = null!;
     
     [Required]
     public string Name { get; set; } = string.Empty;

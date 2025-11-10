@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Dockex.API.Data;
 using Dockex.API.DTOs;
+using Dockex.API.Services;
+using Dockex.API.Models;
 
 namespace Dockex.API.Controllers;
 
@@ -11,14 +13,16 @@ namespace Dockex.API.Controllers;
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<CatalogController> _logger;
+    private readonly ITenantResolutionService _tenantResolution;
     private static readonly object _viewLock = new();
     // Views per day (UTC) per productId
     private static readonly Dictionary<string, int> _viewsToday = new(); // key: yyyyMMdd:productId
 
-    public CatalogController(ApplicationDbContext context, ILogger<CatalogController> logger)
+    public CatalogController(ApplicationDbContext context, ILogger<CatalogController> logger, ITenantResolutionService tenantResolution)
     {
         _context = context;
         _logger = logger;
+        _tenantResolution = tenantResolution;
     }
 
     private static string ViewKey(int productId)
@@ -89,10 +93,17 @@ namespace Dockex.API.Controllers;
                 .Include(p => p.Images)
                 .Where(p => p.IsActive && p.Company.IsApproved && p.Company.IsActive);
 
+            // Restrict to current tenant if header present
+            var currentTenantId = _tenantResolution.GetCurrentTenantId();
+            if (currentTenantId.HasValue)
+            {
+                query = query.Where(p => p.TenantId == currentTenantId.Value);
+            }
+
             // Apply search filters
             if (!string.IsNullOrEmpty(searchDto.Search))
             {
-                var term = searchDto.Search.ToLower();
+                var term = searchDto.Search.Trim().ToLower();
                 query = query.Where(p =>
                     p.Name.ToLower().Contains(term) ||
                     p.Description.ToLower().Contains(term) ||
@@ -189,12 +200,19 @@ namespace Dockex.API.Controllers;
     {
         try
         {
-            var product = await _context.Products
+            var productQuery = _context.Products
                 .Include(p => p.Company)
                 .Include(p => p.Category)
                 .Include(p => p.Images)
-                .FirstOrDefaultAsync(p => p.Id == id && p.IsActive && 
-                                        p.Company.IsApproved && p.Company.IsActive);
+                .Where(p => p.Id == id && p.IsActive && p.Company.IsApproved && p.Company.IsActive);
+
+            var currentTenantId2 = _tenantResolution.GetCurrentTenantId();
+            if (currentTenantId2.HasValue)
+            {
+                productQuery = productQuery.Where(p => p.TenantId == currentTenantId2.Value);
+            }
+
+            var product = await productQuery.FirstOrDefaultAsync();
 
             if (product == null)
             {
@@ -246,6 +264,12 @@ namespace Dockex.API.Controllers;
             var query = _context.Companies
                 .Where(c => c.IsApproved && c.IsActive);
 
+            var currentTenantId3 = _tenantResolution.GetCurrentTenantId();
+            if (currentTenantId3.HasValue)
+            {
+                query = query.Where(c => c.TenantId == currentTenantId3.Value);
+            }
+
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(c => c.Name.Contains(search) || c.Description.Contains(search));
@@ -290,20 +314,20 @@ namespace Dockex.API.Controllers;
         try
         {
             var categories = await _context.Categories
-                .Where(c => c.IsActive)
-                .Include(c => c.Products.Where(p => p.IsActive && p.Company.IsApproved && p.Company.IsActive))
-                .OrderBy(c => c.DisplayOrder)
-                .ThenBy(c => c.Name)
-                .Select(c => new CategoryDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    ParentCategoryId = c.ParentCategoryId,
-                    DisplayOrder = c.DisplayOrder,
-                    ProductsCount = c.Products.Count()
-                })
-                .ToListAsync();
+              .Where(c => c.IsActive)
+              .Include(c => c.Products.Where(p => p.IsActive && p.Company.IsApproved && p.Company.IsActive))
+              .OrderBy(c => c.DisplayOrder)
+              .ThenBy(c => c.Name)
+              .Select(c => new CategoryDto
+              {
+                  Id = c.Id,
+                  Name = c.Name,
+                  Description = c.Description,
+                  ParentCategoryId = c.ParentCategoryId,
+                  DisplayOrder = c.DisplayOrder,
+                  ProductsCount = c.Products.Count()
+              })
+              .ToListAsync();
 
             return Ok(new ApiResponseDto<List<CategoryDto>>(categories));
         }
@@ -319,38 +343,46 @@ namespace Dockex.API.Controllers;
     {
         try
         {
-            var products = await _context.Products
+            var productsBase = _context.Products
                 .Include(p => p.Company)
                 .Include(p => p.Category)
                 .Include(p => p.Images)
-                .Where(p => p.IsFeatured && p.IsActive && p.Company.IsApproved && p.Company.IsActive)
-                .OrderByDescending(p => p.CreatedAt)
-                .Take(take)
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Description = p.Description,
-                    Price = p.Price,
-                    Stock = p.Stock,
-                    CategoryName = p.Category != null ? p.Category.Name : null,
-                    IsActive = p.IsActive,
-                    IsFeatured = p.IsFeatured,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
-                    CompanyId = p.CompanyId,
-                    CompanyName = p.Company.Name,
-                    CompanyContactEmail = p.Company.ContactEmail,
-                    CompanyPhone = p.Company.Phone,
-                    Images = p.Images.OrderBy(i => i.DisplayOrder).Select(i => new ProductImageDto
-                    {
-                        Id = i.Id,
-                        ImageUrl = i.ImageUrl,
-                        IsPrimary = i.IsPrimary,
-                        DisplayOrder = i.DisplayOrder
-                    }).ToList()
-                })
-                .ToListAsync();
+                .Where(p => p.IsFeatured && p.IsActive && p.Company.IsApproved && p.Company.IsActive);
+
+            var currentTenantId5 = _tenantResolution.GetCurrentTenantId();
+            if (currentTenantId5.HasValue)
+            {
+                productsBase = productsBase.Where(p => p.TenantId == currentTenantId5.Value);
+            }
+
+            var products = await productsBase
+              .OrderByDescending(p => p.CreatedAt)
+              .Take(take)
+              .Select(p => new ProductDto
+              {
+                  Id = p.Id,
+                  Name = p.Name,
+                  Description = p.Description,
+                  Price = p.Price,
+                  Stock = p.Stock,
+                  CategoryName = p.Category != null ? p.Category.Name : null,
+                  IsActive = p.IsActive,
+                  IsFeatured = p.IsFeatured,
+                  CreatedAt = p.CreatedAt,
+                  UpdatedAt = p.UpdatedAt,
+                  CompanyId = p.CompanyId,
+                  CompanyName = p.Company.Name,
+                  CompanyContactEmail = p.Company.ContactEmail,
+                  CompanyPhone = p.Company.Phone,
+                  Images = p.Images.OrderBy(i => i.DisplayOrder).Select(i => new ProductImageDto
+                  {
+                      Id = i.Id,
+                      ImageUrl = i.ImageUrl,
+                      IsPrimary = i.IsPrimary,
+                      DisplayOrder = i.DisplayOrder
+                  }).ToList()
+              })
+              .ToListAsync();
 
             return Ok(new ApiResponseDto<List<ProductDto>>(products));
         }

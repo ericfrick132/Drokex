@@ -48,6 +48,37 @@ export const superadminApi = {
   updateBusinessType: (id: number, data: { name?: string; description?: string; displayOrder?: number; isActive?: boolean }) =>
     superAdminClient.put(`/superadmin/business-types/${id}`, data),
   deleteBusinessType: (id: number) => superAdminClient.delete(`/superadmin/business-types/${id}`),
+
+  // Tenant Categories (Super Admin)
+  getTenantCategories: (tenantId: number) => superAdminClient.get(`/superadmin/tenants/${tenantId}/categories`),
+  createTenantCategory: (tenantId: number, data: { name: string; description?: string; displayOrder?: number; parentCategoryId?: number; isActive?: boolean; iconUrl?: string; colorHex?: string }) =>
+    superAdminClient.post(`/superadmin/tenants/${tenantId}/categories`, data),
+  updateTenantCategory: (tenantId: number, id: number, data: { name?: string; description?: string; displayOrder?: number; parentCategoryId?: number; isActive?: boolean; iconUrl?: string; colorHex?: string }) =>
+    superAdminClient.put(`/superadmin/tenants/${tenantId}/categories/${id}`, data),
+  deleteTenantCategory: (tenantId: number, id: number) =>
+    superAdminClient.delete(`/superadmin/tenants/${tenantId}/categories/${id}`),
+
+  // Geography (Cities)
+  getCities: (countryCode?: string) => superAdminClient.get('/superadmin/cities', { params: { countryCode } }),
+  createCity: (data: { countryCode: string; name: string; displayOrder?: number; isActive?: boolean }) =>
+    superAdminClient.post('/superadmin/cities', data),
+  updateCity: (id: number, data: { countryCode?: string; name?: string; displayOrder?: number; isActive?: boolean }) =>
+    superAdminClient.put(`/superadmin/cities/${id}`, data),
+  deleteCity: (id: number) => superAdminClient.delete(`/superadmin/cities/${id}`),
+
+  // Tenant supported countries
+  getTenantSupportedCountries: (tenantId: number) =>
+    superAdminClient.get(`/superadmin/tenants/${tenantId}/supported-countries`),
+  setTenantSupportedCountries: (tenantId: number, countryCodes: string[]) =>
+    superAdminClient.put(`/superadmin/tenants/${tenantId}/supported-countries`, { countryCodes }),
+
+  // Global Categories
+  getGlobalCategories: () => superAdminClient.get('/superadmin/categories'),
+  createGlobalCategory: (data: { name: string; description?: string; displayOrder?: number; parentCategoryId?: number; isActive?: boolean; iconUrl?: string; colorHex?: string }) =>
+    superAdminClient.post('/superadmin/categories', data),
+  updateGlobalCategory: (id: number, data: { name?: string; description?: string; displayOrder?: number; parentCategoryId?: number; isActive?: boolean; iconUrl?: string; colorHex?: string }) =>
+    superAdminClient.put(`/superadmin/categories/${id}`, data),
+  deleteGlobalCategory: (id: number) => superAdminClient.delete(`/superadmin/categories/${id}`),
 };
 
 export default superadminApi;

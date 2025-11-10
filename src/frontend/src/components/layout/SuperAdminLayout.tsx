@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Box, IconButton, Button, Typography, Container, Menu, MenuItem } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import { Dashboard, Domain, Group, Logout, Store } from '@mui/icons-material';
+import { Dashboard, Domain, Group, Logout, Store, Public } from '@mui/icons-material';
 import { drokexColors } from '../../theme/drokexTheme';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DrokexLogo } from '../common';
@@ -42,9 +42,11 @@ const SuperAdminLayout: React.FC = () => {
           </Box>
           <Typography variant="h6" sx={{ fontWeight: 700, mr: 2, display: { xs: 'none', sm: 'block' } }}>Super Admin</Typography>
           <NavButton label="Dashboard" to="/superadmin/dashboard" icon={<Dashboard />} />
-          <NavButton label="Empresas" to="/superadmin/tenants" icon={<Domain />} />
+          <NavButton label="Empresas (Tenants)" to="/superadmin/tenants" icon={<Domain />} />
+          <NavButton label="Categorías" to="/superadmin/categories" icon={<Store />} />
           <NavButton label="Usuarios" to="/superadmin/users" icon={<Group />} />
           <NavButton label="Tipos de Negocio" to="/superadmin/business-types" icon={<Store />} />
+          <NavButton label="Ciudades" to="/superadmin/cities" icon={<Public />} />
           <Box sx={{ ml: 'auto' }}>
             <IconButton color="inherit" onClick={logout} title="Salir">
               <Logout />

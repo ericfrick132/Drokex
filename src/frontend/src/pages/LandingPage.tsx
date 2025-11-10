@@ -30,7 +30,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '../contexts/TenantContext';
-import { leadsApi, tenantsApi } from '../services/api';
+import { leadsApi, tenantsApi, geoApi } from '../services/api';
 import { 
   DrokexLogo, 
   DrokexButton, 
@@ -78,6 +78,9 @@ const LandingPage: React.FC = () => {
   const [heroTitle, setHeroTitle] = useState('Conectando Empresas de LATAM con el Mundo');
   const [heroSubtitle, setHeroSubtitle] = useState('La plataforma que facilita la expansión comercial de empresas latinoamericanas hacia mercados internacionales, sin necesidad de presencia física.');
   const [heroCTA, setHeroCTA] = useState('Registrar mi Empresa');
+  const [heroVideoUrl, setHeroVideoUrl] = useState<string | undefined>(undefined);
+  const [heroVideoPoster, setHeroVideoPoster] = useState<string | undefined>(undefined);
+  const [coverage, setCoverage] = useState<{ countryCode: string; country: string; tenants: number }[]>([]);
   useEffect(() => {
     (async () => {
       try {
@@ -86,6 +89,16 @@ const LandingPage: React.FC = () => {
         if (cms.heroTitle) setHeroTitle(cms.heroTitle);
         if (cms.heroSubtitle) setHeroSubtitle(cms.heroSubtitle);
         if (cms.ctaText) setHeroCTA(cms.ctaText);
+        if (cms.heroVideoUrl) setHeroVideoUrl(cms.heroVideoUrl);
+        if (cms.heroVideoPoster) setHeroVideoPoster(cms.heroVideoPoster);
+      } catch {}
+    })();
+  }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await geoApi.getCoverage();
+        setCoverage(data?.data || []);
       } catch {}
     })();
   }, []);
@@ -206,9 +219,15 @@ const LandingPage: React.FC = () => {
     <Box sx={{ backgroundColor: drokexColors.light, minHeight: '100vh' }}>
       {/* Public Navbar consistent with brand */}
       <PublicNavbar />
-      {/* Hero Section con Degradado */}
-      <DrokexPattern pattern="gradient" opacity={1}>
-        <Container maxWidth="lg" sx={{ pt: 8, pb: 10, textAlign: 'center' }} ref={heroRef}>
+      {/* Hero Section con Degradado y video opcional */}
+      <Box sx={{ position: 'relative' }}>
+        {heroVideoUrl && (
+          <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
+            <Box component="video" src={heroVideoUrl} poster={heroVideoPoster} autoPlay muted loop playsInline preload="metadata" sx={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5)' }} />
+          </Box>
+        )}
+        <DrokexPattern pattern="gradient" opacity={heroVideoUrl ? 0.4 : 1}>
+        <Container maxWidth="lg" sx={{ pt: 8, pb: 10, textAlign: 'center', position: 'relative', zIndex: 1 }} ref={heroRef}>
           <Box sx={{ position: 'relative', mb: 4 }} className="lp-hero-logo">
             <BitsParallax strength={24} sx={{ position: 'absolute', top: -16, left: '15%', zIndex: 0, opacity: 0.18 }}>
               <Box sx={{ width: 120, height: 120, borderRadius: '50%', background: 'white' }} />
@@ -335,7 +354,8 @@ const LandingPage: React.FC = () => {
             </Paper>
           </Box>
         </Container>
-      </DrokexPattern>
+        </DrokexPattern>
+      </Box>
 
       {/* Sección de Beneficios */}
       <Container id="beneficios" maxWidth="lg" sx={{ py: 8 }} ref={benefitsRef}>
@@ -403,6 +423,24 @@ const LandingPage: React.FC = () => {
           ))}
         </Grid>
       </Container>
+
+      {/* Cobertura */}
+      <DrokexPattern pattern="diagonal" opacity={0.03}>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Typography variant="h4" sx={{ textAlign: 'center', mb: 2, color: drokexColors.dark, fontWeight: 500 }}>Países donde operamos</Typography>
+          <Typography variant="body1" sx={{ textAlign: 'center', mb: 4, color: drokexColors.secondary }}>Construimos una red regional de marketplaces por país</Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center' }}>
+            {coverage.map(c => (
+              <Chip key={c.countryCode} label={`${c.country} (${c.tenants})`} />
+            ))}
+            {coverage.length === 0 && (
+              <Typography variant="body2" sx={{ color: drokexColors.secondary }}>
+                Próximamente mostraremos cobertura por país.
+              </Typography>
+            )}
+          </Box>
+        </Container>
+      </DrokexPattern>
 
       {/* Sección de Características */}
       <Box sx={{ backgroundColor: 'white', py: 8 }}>

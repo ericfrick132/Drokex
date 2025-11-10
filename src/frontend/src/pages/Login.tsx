@@ -9,6 +9,7 @@ import {
   Tooltip,
   TextField,
   MenuItem,
+  IconButton,
 } from '@mui/material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,7 +23,7 @@ import {
   DrokexPattern 
 } from '../components/common';
 import { drokexColors } from '../theme/drokexTheme';
-import { Email, Lock } from '@mui/icons-material';
+import { Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import PublicFooter from '../components/layout/PublicFooter';
 
@@ -31,6 +32,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState('admin@cafemonteverde.hn');
   const [password, setPassword] = useState('Admin123!');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [pwVisible, setPwVisible] = useState(false);
   
   const { login, isLoading, error } = useAuth();
   const { tenant, getCountryFlag } = useTenant();
@@ -174,12 +176,19 @@ const Login: React.FC = () => {
 
               <DrokexInput
                 label="Contraseña"
-                type="password"
+                type={pwVisible ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={!!errors.password}
                 helperText={errors.password}
                 icon={<Lock sx={{ color: drokexColors.secondary }} />}
+                InputProps={{
+                  endAdornment: (
+                    <IconButton onClick={() => setPwVisible(v => !v)} edge="end" aria-label="mostrar contraseña">
+                      {pwVisible ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  )
+                }}
                 sx={{ mb: 3 }}
                 disabled={isLoading}
               />

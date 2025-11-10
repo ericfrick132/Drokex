@@ -9,6 +9,8 @@ const AdminLandingCMS: React.FC = () => {
   const [heroSubtitle, setHeroSubtitle] = useState('');
   const [ctaText, setCtaText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [heroVideoUrl, setHeroVideoUrl] = useState('');
+  const [heroVideoPoster, setHeroVideoPoster] = useState('');
   const [saved, setSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,6 +22,8 @@ const AdminLandingCMS: React.FC = () => {
         if (cms.heroTitle) setHeroTitle(cms.heroTitle);
         if (cms.heroSubtitle) setHeroSubtitle(cms.heroSubtitle);
         if (cms.ctaText) setCtaText(cms.ctaText);
+        if (cms.heroVideoUrl) setHeroVideoUrl(cms.heroVideoUrl);
+        if (cms.heroVideoPoster) setHeroVideoPoster(cms.heroVideoPoster);
       } catch (e: any) {
         setError(e?.response?.data?.message || 'No se pudo cargar el contenido');
       }
@@ -29,7 +33,7 @@ const AdminLandingCMS: React.FC = () => {
   const save = async () => {
     setLoading(true); setError(null); setSaved(null);
     try {
-      await tenantsApi.updateCms({ heroTitle, heroSubtitle, ctaText });
+      await tenantsApi.updateCms({ heroTitle, heroSubtitle, ctaText, heroVideoUrl, heroVideoPoster });
       setSaved('Contenido guardado');
     } catch (e: any) {
       setError(e?.response?.data?.message || 'No se pudo guardar');
@@ -53,6 +57,12 @@ const AdminLandingCMS: React.FC = () => {
             <Grid item xs={12}>
               <TextField label="Texto del botón (CTA)" value={ctaText} onChange={(e) => setCtaText(e.target.value)} fullWidth />
             </Grid>
+            <Grid item xs={12} md={8}>
+              <TextField label="Hero Video URL (opcional)" placeholder="https://.../video.mp4" value={heroVideoUrl} onChange={(e) => setHeroVideoUrl(e.target.value)} fullWidth />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField label="Poster (opcional)" placeholder="https://.../poster.jpg" value={heroVideoPoster} onChange={(e) => setHeroVideoPoster(e.target.value)} fullWidth />
+            </Grid>
           </Grid>
           <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
             <DrokexButton variant="primary" onClick={save} loading={loading}>Guardar</DrokexButton>
@@ -64,4 +74,3 @@ const AdminLandingCMS: React.FC = () => {
 };
 
 export default AdminLandingCMS;
-

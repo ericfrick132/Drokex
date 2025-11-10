@@ -31,6 +31,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<SuperAdmin> SuperAdmins { get; set; }
     public DbSet<Activity> Activities { get; set; }
     public DbSet<BusinessType> BusinessTypes { get; set; }
+    public DbSet<City> Cities { get; set; }
+    public DbSet<TenantSupportedCountry> TenantSupportedCountries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -188,33 +190,21 @@ public class ApplicationDbContext : DbContext
             }
         });
 
-        // Category configurations
+        // Category configurations (global)
         modelBuilder.Entity<Category>(entity =>
         {
             entity.Property(c => c.Name).HasMaxLength(100);
             entity.Property(c => c.IconUrl).HasMaxLength(500);
             entity.Property(c => c.ColorHex).HasMaxLength(7);
-            
-            // Relación con Tenant
-            entity.HasOne(c => c.Tenant)
-                  .WithMany()
-                  .HasForeignKey(c => c.TenantId)
-                  .OnDelete(DeleteBehavior.Restrict);
-            
-            // Relación Category self-referencing
+
+            // Self-referencing hierarchy
             entity.HasOne(c => c.ParentCategory)
                   .WithMany(c => c.SubCategories)
                   .HasForeignKey(c => c.ParentCategoryId)
                   .OnDelete(DeleteBehavior.Restrict);
 
-            // Índices
-            entity.HasIndex(c => new { c.TenantId, c.IsActive, c.DisplayOrder });
-
-            // Filtro global por tenant
-            if (currentTenantId.HasValue)
-            {
-                entity.HasQueryFilter(c => c.TenantId == currentTenantId.Value);
-            }
+            // Índices globales
+            entity.HasIndex(c => new { c.IsActive, c.DisplayOrder });
         });
 
         // Lead configurations
@@ -253,6 +243,26 @@ public class ApplicationDbContext : DbContext
             entity.Property(b => b.Description).HasMaxLength(300);
             entity.HasIndex(b => b.Name).IsUnique();
             entity.HasIndex(b => new { b.IsActive, b.DisplayOrder });
+        });
+
+        // City configurations (global)
+        modelBuilder.Entity<City>(entity =>
+        {
+            entity.Property(c => c.CountryCode).HasMaxLength(3).IsRequired();
+            entity.Property(c => c.Name).HasMaxLength(100).IsRequired();
+            entity.HasIndex(c => new { c.CountryCode, c.Name }).IsUnique();
+            entity.HasIndex(c => new { c.CountryCode, c.IsActive, c.DisplayOrder });
+        });
+
+        // TenantSupportedCountry configurations (mapping)
+        modelBuilder.Entity<TenantSupportedCountry>(entity =>
+        {
+            entity.Property(x => x.CountryCode).HasMaxLength(3).IsRequired();
+            entity.HasOne(x => x.Tenant)
+                  .WithMany()
+                  .HasForeignKey(x => x.TenantId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(x => new { x.TenantId, x.CountryCode }).IsUnique();
         });
 
         // Activity configurations

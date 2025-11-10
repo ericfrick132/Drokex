@@ -14,6 +14,7 @@ import AppLayout from './components/layout/AppLayout';
 // Páginas
 import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
+import About from './pages/About';
 import Catalog from './pages/Catalog';
 import ProductDetail from './pages/ProductDetail';
 import Companies from './pages/Companies';
@@ -43,6 +44,10 @@ import TenantDetail from './pages/SuperAdmin/TenantDetail';
 import UsersList from './pages/SuperAdmin/UsersList';
 import LandingCMS from './pages/SuperAdmin/LandingCMS';
 import BusinessTypes from './pages/SuperAdmin/BusinessTypes';
+import TenantCategories from './pages/SuperAdmin/TenantCategories';
+import CitiesManager from './pages/SuperAdmin/CitiesManager';
+import GlobalCategories from './pages/SuperAdmin/GlobalCategories';
+import TenantSupportedCountries from './pages/SuperAdmin/TenantSupportedCountries';
 // import Products from './pages/Products';
 // import Company from './pages/Company';
 // import AdminPanel from './pages/AdminPanel';
@@ -166,6 +171,7 @@ const MainRoutesInner: React.FC = () => (
       <Route path="/catalog/:id" element={<ProductDetail />} />
       <Route path="/companies" element={<Companies />} />
       <Route path="/companies/:id" element={<CompanyPublic />} />
+      <Route path="/about" element={<About />} />
 
       {/* Rutas protegidas con layout */}
       <Route
@@ -408,6 +414,10 @@ const SuperAdminRoutes: React.FC = () => (
       <Route path="dashboard" element={<SuperAdminDashboard />} />
       <Route path="tenants" element={<TenantsList />} />
       <Route path="tenants/:id" element={<TenantDetail />} />
+      <Route path="tenants/:id/categories" element={<TenantCategories />} />
+      <Route path="categories" element={<GlobalCategories />} />
+      <Route path="tenants/:id/supported-countries" element={<TenantSupportedCountries />} />
+      <Route path="cities" element={<CitiesManager />} />
       <Route path="empresas" element={<TenantsList />} />
       <Route path="empresas/:id" element={<TenantDetail />} />
       <Route path="users" element={<UsersList />} />

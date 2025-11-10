@@ -209,24 +209,19 @@ public class DbSeeder
 
     private async Task SeedCategoriesAsync()
     {
+        var exists = await _context.Categories.AnyAsync();
+        if (exists) return;
+
         var categories = new[]
         {
-            new Category { Name = "Agricultura", Description = "Productos agrícolas y alimentarios", TenantId = 1, DisplayOrder = 1, IsActive = true },
-            new Category { Name = "Textiles", Description = "Ropa y productos textiles", TenantId = 1, DisplayOrder = 2, IsActive = true },
-            new Category { Name = "Artesanías", Description = "Productos artesanales y tradicionales", TenantId = 1, DisplayOrder = 3, IsActive = true },
-            new Category { Name = "Café", Description = "Café de especialidad", TenantId = 1, DisplayOrder = 4, IsActive = true },
-            new Category { Name = "Miel", Description = "Miel y productos apícolas", TenantId = 1, DisplayOrder = 5, IsActive = true },
-            
-            new Category { Name = "Agricultura", Description = "Productos agrícolas y alimentarios", TenantId = 2, DisplayOrder = 1, IsActive = true },
-            new Category { Name = "Textiles", Description = "Ropa y productos textiles", TenantId = 2, DisplayOrder = 2, IsActive = true },
-            new Category { Name = "Artesanías", Description = "Productos artesanales y tradicionales", TenantId = 2, DisplayOrder = 3, IsActive = true },
-            new Category { Name = "Cardamomo", Description = "Cardamomo de alta calidad", TenantId = 2, DisplayOrder = 4, IsActive = true },
-            
-            new Category { Name = "Agricultura", Description = "Productos agrícolas y alimentarios", TenantId = 3, DisplayOrder = 1, IsActive = true },
-            new Category { Name = "Textiles", Description = "Ropa y productos textiles", TenantId = 3, DisplayOrder = 2, IsActive = true },
-            new Category { Name = "Artesanías", Description = "Productos artesanales y tradicionales", TenantId = 3, DisplayOrder = 3, IsActive = true },
-            new Category { Name = "Aguacate", Description = "Aguacate Hass de exportación", TenantId = 3, DisplayOrder = 4, IsActive = true },
-            new Category { Name = "Tequila", Description = "Tequila y bebidas espirituosas", TenantId = 3, DisplayOrder = 5, IsActive = true },
+            new Category { Name = "Agricultura", Description = "Productos agrícolas y alimentarios", DisplayOrder = 1, IsActive = true },
+            new Category { Name = "Textiles", Description = "Ropa y productos textiles", DisplayOrder = 2, IsActive = true },
+            new Category { Name = "Artesanías", Description = "Productos artesanales y tradicionales", DisplayOrder = 3, IsActive = true },
+            new Category { Name = "Café", Description = "Café de especialidad", DisplayOrder = 4, IsActive = true },
+            new Category { Name = "Miel", Description = "Miel y productos apícolas", DisplayOrder = 5, IsActive = true },
+            new Category { Name = "Cardamomo", Description = "Cardamomo de alta calidad", DisplayOrder = 6, IsActive = true },
+            new Category { Name = "Aguacate", Description = "Aguacate Hass de exportación", DisplayOrder = 7, IsActive = true },
+            new Category { Name = "Tequila", Description = "Tequila y bebidas espirituosas", DisplayOrder = 8, IsActive = true },
         };
 
         await _context.Categories.AddRangeAsync(categories);
@@ -467,15 +462,12 @@ public class DbSeeder
         // Productos para cada empresa
         foreach (var company in companies)
         {
-            var companyCategoriesIds = categories
-                .Where(c => c.TenantId == company.TenantId)
-                .Select(c => c.Id)
-                .ToList();
+            // Categorías globales (no por tenant)
 
             switch (company.Name)
             {
                 case "Café Monte Verde Honduras":
-                    var cafeCategory = categories.First(c => c.Name == "Café" && c.TenantId == company.TenantId);
+                    var cafeCategory = categories.First(c => c.Name == "Café");
                     products.AddRange(new[]
                     {
                         new Product
@@ -518,7 +510,7 @@ public class DbSeeder
                     break;
 
                 case "Miel Dorada":
-                    var mielCategory = categories.First(c => c.Name == "Miel" && c.TenantId == company.TenantId);
+                    var mielCategory = categories.First(c => c.Name == "Miel");
                     products.AddRange(new[]
                     {
                         new Product
@@ -543,7 +535,7 @@ public class DbSeeder
                     break;
 
                 case "Textiles Maya Guatemala":
-                    var textilesCategory = categories.First(c => c.Name == "Textiles" && c.TenantId == company.TenantId);
+                    var textilesCategory = categories.First(c => c.Name == "Textiles");
                     products.AddRange(new[]
                     {
                         new Product
@@ -568,7 +560,7 @@ public class DbSeeder
                     break;
 
                 case "Cardamomo Premium GT":
-                    var cardamomoCategory = categories.First(c => c.Name == "Cardamomo" && c.TenantId == company.TenantId);
+                    var cardamomoCategory = categories.First(c => c.Name == "Cardamomo");
                     products.AddRange(new[]
                     {
                         new Product
@@ -593,7 +585,7 @@ public class DbSeeder
                     break;
 
                 case "Aguacates Michoacán":
-                    var aguacateCategory = categories.First(c => c.Name == "Aguacate" && c.TenantId == company.TenantId);
+                    var aguacateCategory = categories.First(c => c.Name == "Aguacate");
                     products.AddRange(new[]
                     {
                         new Product
@@ -618,7 +610,7 @@ public class DbSeeder
                     break;
 
                 case "Tequila Artesanal Los Altos":
-                    var tequilaCategory = categories.First(c => c.Name == "Tequila" && c.TenantId == company.TenantId);
+                    var tequilaCategory = categories.First(c => c.Name == "Tequila");
                     products.AddRange(new[]
                     {
                         new Product

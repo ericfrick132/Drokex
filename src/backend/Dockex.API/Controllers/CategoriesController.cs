@@ -36,9 +36,6 @@ public class CategoriesController : BaseTenantController
     {
         try
         {
-            var tenantValidation = ValidateTenantRequired();
-            if (tenantValidation != null) return tenantValidation;
-
             if (string.IsNullOrWhiteSpace(req.Name))
             {
                 return BadRequest(new ApiResponseDto<CategoryDto>("El nombre es requerido"));
@@ -55,7 +52,6 @@ public class CategoriesController : BaseTenantController
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
             };
-            AssignCurrentTenant(entity);
 
             _context.Categories.Add(entity);
             await _context.SaveChangesAsync();
@@ -79,4 +75,3 @@ public class CategoriesController : BaseTenantController
         }
     }
 }
-

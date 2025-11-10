@@ -240,4 +240,14 @@ public class TenantService : ITenantService
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<string>> GetSupportedCountriesAsync(int tenantId)
+    {
+        // Si no hay configuración específica, devolver lista vacía (frontend hará fallback)
+        return await _context.TenantSupportedCountries
+            .Where(x => x.TenantId == tenantId)
+            .OrderBy(x => x.CountryCode)
+            .Select(x => x.CountryCode)
+            .ToListAsync();
+    }
 }

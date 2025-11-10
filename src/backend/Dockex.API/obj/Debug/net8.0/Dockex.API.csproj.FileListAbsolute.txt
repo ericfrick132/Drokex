@@ -432,3 +432,14 @@ D:\code\efcloud\projects\Drokex\src\backend\dockex.api\obj\Debug\net8.0\refint\D
 D:\code\efcloud\projects\Drokex\src\backend\dockex.api\obj\Debug\net8.0\Dockex.API.pdb
 D:\code\efcloud\projects\Drokex\src\backend\dockex.api\obj\Debug\net8.0\Dockex.API.genruntimeconfig.cache
 D:\code\efcloud\projects\Drokex\src\backend\dockex.api\obj\Debug\net8.0\ref\Dockex.API.dll
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.csproj.AssemblyReference.cache
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.GeneratedMSBuildEditorConfig.editorconfig
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.AssemblyInfoInputs.cache
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.AssemblyInfo.cs
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.csproj.CoreCompileInputs.cache
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.MvcApplicationPartsAssemblyInfo.cs
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.MvcApplicationPartsAssemblyInfo.cache
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.sourcelink.json
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.dll
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\refint\Dockex.API.dll
+D:\code\efcloud\projects\CLIENTS\Drokex\src\backend\Dockex.API\obj\Debug\net8.0\Dockex.API.pdb

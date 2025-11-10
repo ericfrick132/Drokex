@@ -37,6 +37,9 @@ const PublicNavbar: React.FC = () => {
           <Link href="#beneficios" sx={linkSx}>
             Beneficios
           </Link>
+          <Link href="/about" sx={linkSx}>
+            Quiénes somos
+          </Link>
           <Link href="/catalog" sx={linkSx}>
             Productos
           </Link>

@@ -196,6 +196,14 @@ export const catalogApi = {
     apiClient.get('/catalog/business-types'),
 };
 
+// Geo API (public)
+export const geoApi = {
+  getCities: (countryCode: string) =>
+    apiClient.get(`/geo/cities/${encodeURIComponent(countryCode)}`),
+  getCoverage: () =>
+    apiClient.get('/geo/coverage'),
+};
+
 // Leads API
 export const leadsApi = {
   createLead: (data: CreateLeadRequest): Promise<AxiosResponse<ApiResponse<Lead>>> => 
@@ -226,10 +234,12 @@ export const tenantsApi = {
     apiClient.get('/tenants/statistics'),
   getCurrent: (): Promise<AxiosResponse<ApiResponse<any>>> =>
     apiClient.get('/tenants/current'),
-  getCms: (): Promise<AxiosResponse<ApiResponse<{ heroTitle?: string; heroSubtitle?: string; ctaText?: string }>>> =>
+  getCms: (): Promise<AxiosResponse<ApiResponse<{ heroTitle?: string; heroSubtitle?: string; ctaText?: string; heroVideoUrl?: string; heroVideoPoster?: string }>>> =>
     apiClient.get('/tenants/cms'),
-  updateCms: (data: { heroTitle?: string; heroSubtitle?: string; ctaText?: string }): Promise<AxiosResponse<ApiResponse<any>>> =>
+  updateCms: (data: { heroTitle?: string; heroSubtitle?: string; ctaText?: string; heroVideoUrl?: string; heroVideoPoster?: string }): Promise<AxiosResponse<ApiResponse<any>>> =>
     apiClient.put('/tenants/cms', data),
+  getSupportedCountries: (): Promise<AxiosResponse<ApiResponse<string[]>>> =>
+    apiClient.get('/tenants/supported-countries'),
   checkSubdomain: (subdomain: string): Promise<AxiosResponse<ApiResponse<{ Subdomain: string; IsAvailable: boolean; SuggestedUrl: string; Message: string }>>> =>
     apiClient.get(`/tenants/check-subdomain/${encodeURIComponent(subdomain)}`),
   setupTenant: (payload: { subdomain: string; country: string; countryCode: string; currency: string; currencySymbol: string; adminEmail: string; timeZone?: string; languageCode?: string; }): Promise<AxiosResponse<ApiResponse<any>>> =>

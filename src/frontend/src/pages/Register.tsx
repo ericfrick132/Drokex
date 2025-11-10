@@ -43,7 +43,7 @@ import {
 } from '@mui/icons-material';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import PublicFooter from '../components/layout/PublicFooter';
-import { tenantsApi, imagesApi, companiesApi, authApi, catalogApi } from '../services/api';
+import { tenantsApi, imagesApi, companiesApi, authApi, catalogApi, geoApi } from '../services/api';
 import { COUNTRIES, findCountryByCode } from '../data/countries';
 import { CITIES_BY_COUNTRY } from '../data/cities';
 // Business types se cargan desde API del catálogo
@@ -115,6 +115,9 @@ const Register: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [businessTypes, setBusinessTypes] = useState<string[]>([]);
+  const [countriesList, setCountriesList] = useState(COUNTRIES);
+  const [supportedCountryCodes, setSupportedCountryCodes] = useState<string[] | null>(null);
+  const [cityOptions, setCityOptions] = useState<string[] | null>(null);
 
   const steps = ['Información de la Empresa', 'Datos de Contacto', 'Cuenta de Usuario'];
 
@@ -171,6 +174,66 @@ const Register: React.FC = () => {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // Cargar lista extendida de países (si existe en /countries.json)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/countries.json', { cache: 'no-cache' });
+        if (!res.ok) return;
+        const list = await res.json();
+        if (!cancelled && Array.isArray(list) && list.length) {
+          setCountriesList(list);
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Cargar países soportados por el tenant (si aplica)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await tenantsApi.getSupportedCountries();
+        const codes = (data?.data || []) as string[];
+        if (!cancelled && codes && codes.length) {
+          setSupportedCountryCodes(codes);
+          setCountriesList((prev) => prev.filter(c => codes.includes(c.code)));
+          // Ajustar país seleccionado si no está permitido
+          if (!codes.includes(formData.countryCode)) {
+            const newCode = codes[0];
+            const c = findCountryByCode(newCode) || COUNTRIES.find(cc => cc.code === newCode);
+            setFormData(prev => ({
+              ...prev,
+              countryCode: newCode,
+              country: c?.name || prev.country,
+              phoneDial: c?.dialCode || prev.phoneDial,
+            }));
+          }
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Cargar ciudades desde backend cuando cambia el país
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await geoApi.getCities(formData.countryCode);
+        const arr = (data?.data || []) as { id: number; name: string }[];
+        if (!cancelled) {
+          setCityOptions(arr && arr.length ? arr.map(x => x.name) : (CITIES_BY_COUNTRY[formData.countryCode] || null));
+        }
+      } catch {
+        if (!cancelled) setCityOptions(CITIES_BY_COUNTRY[formData.countryCode] || null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [formData.countryCode]);
 
   const validateStep = (step: number) => {
     const newErrors: { [key: string]: string } = {};
@@ -311,20 +374,13 @@ const Register: React.FC = () => {
 
     try {
       setIsSubmitted(true);
-      // Asegurar subdominio disponible y crear tenant si no existe
+      // Crear tenant directamente (el backend validará disponibilidad de subdominio)
       const s = slugify(formData.name);
       if (!s) {
         setErrors(prev => ({ ...prev, name: 'El nombre de la empresa es requerido' }));
         setIsSubmitted(false);
         return;
       }
-      const { data: chk } = await tenantsApi.checkSubdomain(s);
-      if (!chk.data?.IsAvailable) {
-        setErrors(prev => ({ ...prev, name: 'El subdominio generado ya existe. Ajusta el nombre de la empresa.' }));
-        setIsSubmitted(false);
-        return;
-      }
-
       // Crear tenant con mínimos por defecto (se puede ajustar luego)
       const { data: setup } = await tenantsApi.setupTenant({
         subdomain: s,
@@ -336,7 +392,8 @@ const Register: React.FC = () => {
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
         languageCode: 'es',
       });
-      const newTenantId: number | undefined = setup.data?.Id ?? setup.data?.id ?? setup.data?.createdTenant?.Id ?? setup.data?.createdTenant?.id;
+      const payload = (setup?.data as any) || {};
+      const newTenantId: number | undefined = payload.Id ?? payload.id ?? payload.createdTenant?.Id ?? payload.createdTenant?.id;
       if (!newTenantId) {
         throw new Error('No se pudo crear el tenant');
       }
@@ -390,9 +447,13 @@ const Register: React.FC = () => {
       // El usuario será redirigido automáticamente por el contexto de autenticación
       // o se mostrará un mensaje de éxito si requiere aprobación
       
-    } catch (error) {
+    } catch (error: any) {
       // Error manejado por el contexto
       console.error('Registration error:', error);
+      const message = error?.response?.data?.message || '';
+      if (message.toLowerCase().includes('subdominio')) {
+        setErrors(prev => ({ ...prev, name: 'El subdominio generado ya existe. Ajusta el nombre de la empresa.' }));
+      }
       setIsSubmitted(false);
     }
   };
@@ -518,7 +579,7 @@ const Register: React.FC = () => {
               <FormControl fullWidth>
                 <InputLabel id="country-label">País *</InputLabel>
                 <Select labelId="country-label" label="País *" value={formData.countryCode} onChange={(e) => handleCountryChange(e.target.value as string)} disabled={isLoading}>
-                  {COUNTRIES.map(c => (
+                  {countriesList.map(c => (
                     <MenuItem key={c.code} value={c.code}>{c.name}</MenuItem>
                   ))}
                 </Select>
@@ -530,7 +591,7 @@ const Register: React.FC = () => {
                 <FormControl sx={{ minWidth: 120 }}>
                   <InputLabel id="dial-label">Indicativo</InputLabel>
                   <Select labelId="dial-label" label="Indicativo" value={formData.phoneDial} onChange={(e) => setFormData(prev => ({ ...prev, phoneDial: e.target.value as string }))}>
-                    {COUNTRIES.map(c => (
+                    {countriesList.map(c => (
                       <MenuItem key={c.code} value={c.dialCode}>{`${c.code} ${c.dialCode}`}</MenuItem>
                     ))}
                   </Select>
@@ -552,11 +613,11 @@ const Register: React.FC = () => {
             </Grid>
 
             <Grid item xs={12} md={6}>
-              {CITIES_BY_COUNTRY[formData.countryCode] ? (
+              {cityOptions && cityOptions.length ? (
                 <FormControl fullWidth>
                   <InputLabel id="city-label">Ciudad *</InputLabel>
                   <Select labelId="city-label" label="Ciudad *" value={formData.city} onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value as string }))} disabled={isLoading}>
-                    {CITIES_BY_COUNTRY[formData.countryCode].map(ct => (<MenuItem key={ct} value={ct}>{ct}</MenuItem>))}
+                    {cityOptions.map(ct => (<MenuItem key={ct} value={ct}>{ct}</MenuItem>))}
                   </Select>
                 </FormControl>
               ) : (

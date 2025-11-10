@@ -20,6 +20,7 @@ import {
   Menu as MenuIcon,
   Home,
   Storefront,
+  Public,
 } from '@mui/icons-material';
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -213,6 +214,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             <ListItemButton onClick={() => navigate('/catalog')}>
               <ListItemIcon><Storefront sx={{ color: drokexColors.secondary }} /></ListItemIcon>
               <ListItemText primary="Catálogo" />
+            </ListItemButton>
+            <ListItemButton onClick={() => navigate('/') }>
+              <ListItemIcon><Public sx={{ color: drokexColors.secondary }} /></ListItemIcon>
+              <ListItemText primary="Inicio Público" />
             </ListItemButton>
             <ListItemButton onClick={() => navigate('/profile')}>
               <ListItemIcon><AccountCircle sx={{ color: drokexColors.secondary }} /></ListItemIcon>

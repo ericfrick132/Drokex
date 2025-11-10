@@ -46,7 +46,13 @@ const TenantDetail: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700, mb: 3 }}>Editar Empresa</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h5" sx={{ color: drokexColors.dark, fontWeight: 700 }}>Editar Empresa</Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button variant="outlined" onClick={() => navigate(`/superadmin/categories`)}>Categorías Globales</Button>
+          <Button variant="outlined" onClick={() => navigate(`/superadmin/tenants/${id}/supported-countries`)}>Países Soportados</Button>
+        </Box>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
           <DrokexCard>

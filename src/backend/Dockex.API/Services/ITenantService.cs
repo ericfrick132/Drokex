@@ -26,6 +26,9 @@ public interface ITenantService
     // Configuración regional
     Task<TenantConfiguration> GetTenantConfigurationAsync(int tenantId);
     Task UpdateTenantConfigurationAsync(int tenantId, TenantConfiguration config);
+
+    // Países soportados
+    Task<List<string>> GetSupportedCountriesAsync(int tenantId);
 }
 
 public class TenantStatistics

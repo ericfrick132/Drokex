@@ -1,0 +1,65 @@
+Checklist de fixes Drokex (registro, productos y contacto)
+
+Estado:
+- [x] Tipo de negocio: listado en registro de empresa (Select con catálogo y fallback)
+- [x] Subir logotipo de la empresa en registro (carga a /api/images/upload)
+- [x] Teléfono: listado de países con indicativo (Select de prefijo + campo número)
+- [x] Ciudad: listado según país (según `CITIES_BY_COUNTRY`)
+- [x] País: listado mundial (carga extendida desde /countries.json con prefijos)
+- [x] Contraseña: explicación mínima (número + signo, min. 8) y validación
+- [x] Contraseña: ojo para visualizar/ocultar
+- [x] Botón "Registrar Empresa" deshabilitado tras enviar para evitar duplicados
+
+- [x] Productos: crear/editar permite subir/cambiar imágenes (nuevo y edición)
+- [x] Mis Productos: navegación con menú hamburguesa (layout con Drawer)
+- [~] Búsqueda catálogo: afinada (case-insensitive + restricción por tenant). Pendiente validar con datos reales
+- [x] Categorías: ampliar catálogo (CRUD en Super Admin por tenant, importar CSV)
+
+- [~] Contactar empresa: diálogo tipo chat (MVP vía Lead creado). Chat interno persistente está EXCLUIDO del MVP según prd.md.
+
+Notas y referencias:
+- Registro empresa: `src/frontend/src/pages/Register.tsx` (campos, selects y carga de logo)
+- Países/Ciudades: `src/frontend/src/data/countries.ts` y `src/frontend/src/data/cities.ts`
+- Imágenes productos (frontend): `src/frontend/src/pages/ProductForm.tsx`
+- Imágenes productos (backend): `ProductsController` e `ImagesController`
+- Catálogo/Búsqueda (frontend): `src/frontend/src/pages/Catalog.tsx`
+- Catálogo/Búsqueda (backend): `CatalogController`
+- Menú hamburguesa: `src/frontend/src/components/layout/AppLayout.tsx`
+- Contacto (MVP): diálogo en `src/frontend/src/pages/ProductDetail.tsx` -> `leadsApi.createLead`
+
+Pendientes propuestos:
+1) Países: cargar lista mundial completa (ISO-3166) con prefijos.
+2) Búsqueda: revisar datos de ejemplo y aprobación de empresa; mejorar relevancia.
+3) Categorías: sembrado inicial más amplio y/o flujo de "solicitar categoría" para proveedores.
+
+Fase 1
+CRUDes de Super Admin (revisión y propuestas):
+- [x] Tipos de Negocio: CRUD Super Admin (ya implementado)
+- [x] Tenants (Empresas): listado, detalle, aprobación y edición (implementado)
+- [x] Usuarios (global): listado por tenant (implementado)
+- [x] Categorías por Tenant: CRUD en Super Admin (listar/crear/editar/eliminar)
+ - Incluye importador CSV y base sugerida (`/default_categories.csv`)
+- [x] Catálogo de Ciudades por País: CRUD en Super Admin (opcional), para reemplazar `CITIES_BY_COUNTRY`
+- [x] Países soportados por tenant: definir/limitar países y prefijos por tenant (opcional)
+
+Se suman desde conversación (branding, UX, contenidos):
+- [x] Landing con animaciones (GSAP u otra lib) y CTA claros (Registrar como proveedor, Buscar proveedor)
+- [x] Video institucional de bienvenida en el hero (opcional autoplay controlado)
+- [x] Página/sección “Quiénes somos” + presencia de marca más fuerte y contraste (verde oscuro + lima)
+- [x] Mostrar países en los que opera Drokex (mapa/listado), y target de exportación por empresa
+- [x] En App (autenticado): acceso evidente a Catálogo y/o Home público sin cerrar sesión (revisar agregar “Inicio” además de “Catálogo” en Drawer)
+- [x] Catálogo y Directorio públicos (agregador cross-tenant cuando no hay subdominio) con footer y navbar públicos
+
+Fase 2 (planeación funcional y técnica):
+Chat interno: modelo de conversaciones + mensajes y UI con polling/WebSocket.
+- [ ] Tutoría/Academia: página de tutoriales (integración con YouTube) y enlaces a videos
+- [ ] Ayuda contextual in-app (tours/coach marks, onboarding al primer login, opción “No mostrar de nuevo” y botón de ayuda)
+- [ ] CMS real para contenidos de landing (reemplazar demo localStorage en SuperAdmin > LandingCMS por persistencia en backend)
+- [ ] Gestión de inventario transaccional (movimientos de stock por pedidos/entregas, ajustes manuales)
+- [ ] Órdenes/Pedidos (crear, estados, historial) y decremento de stock
+- [ ] Liquidaciones/Wallet: saldos, retenciones, costos (recaudo, envío, bodegaje), reportes
+- [ ] Planes y monetización (tiers tipo Alibaba Gold, suscripción mensual/anual, verificación de proveedores)
+- [ ] Integración pagos (Stripe u otros) modo sandbox > producción
+- [ ] CDN/almacenamiento de imágenes configurable (Cloudinary actual; evaluar Bunny/CDN alternativo según costos)
+- [ ] SEO landing (metatags, OG, sitemap) y performance web (LCP/CLS) tras animaciones
+- [ ] Búsqueda acento-insensible y sinónimos (mejora de relevancia)
