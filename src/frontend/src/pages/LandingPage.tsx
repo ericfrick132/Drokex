@@ -8,13 +8,13 @@ import {
   Alert,
   Paper,
   Chip,
-  Card,
-  CardContent,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Tooltip,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
 import {
   Business,
@@ -27,6 +27,9 @@ import {
   Email,
   Phone,
   LocationOn,
+  ChevronLeft,
+  ChevronRight,
+  Search,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '../contexts/TenantContext';
@@ -37,15 +40,15 @@ import {
   DrokexInput, 
   DrokexCard, 
   DrokexCardContent,
-  DrokexCardActions,
   DrokexPattern 
 } from '../components/common';
 import { drokexColors } from '../theme/drokexTheme';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import PublicFooter from '../components/layout/PublicFooter';
 import BitsReveal from '../components/bits/BitsReveal';
-import BitsParallax from '../components/bits/BitsParallax';
 import BitsTilt from '../components/bits/BitsTilt';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 interface LeadFormData {
   companyName: string;
@@ -56,8 +59,21 @@ interface LeadFormData {
   message: string;
 }
 
+type HeroLinkAction = 'benefits' | 'features' | 'contact' | 'catalog' | 'register';
+
+interface HeroSlide {
+  id: string;
+  tag: string;
+  title: string;
+  description: string;
+  image: string;
+  accent: string;
+  links: { label: string; action: HeroLinkAction }[];
+}
+
 const LandingPage: React.FC = () => {
   const heroRef = useRef<HTMLDivElement | null>(null);
+  const heroVisualRef = useRef<HTMLDivElement | null>(null);
   const benefitsRef = useRef<HTMLDivElement | null>(null);
   const featuresRef = useRef<HTMLDivElement | null>(null);
   const leadFormRef = useRef<HTMLDivElement | null>(null);
@@ -81,6 +97,184 @@ const LandingPage: React.FC = () => {
   const [heroVideoUrl, setHeroVideoUrl] = useState<string | undefined>(undefined);
   const [heroVideoPoster, setHeroVideoPoster] = useState<string | undefined>(undefined);
   const [coverage, setCoverage] = useState<{ countryCode: string; country: string; tenants: number }[]>([]);
+  const navigate = useNavigate();
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+
+  const heroSlides = useMemo<HeroSlide[]>(
+    () => [
+      {
+        id: 'providers',
+        tag: 'Quiero vender (proveedor)',
+        title: 'Conecta tu empresa con compradores B2B verificados',
+        description: 'Publica catálogos, recibe solicitudes calificadas y negocia con asistencia humana en minutos.',
+        image: '/assets/landing/hero-slide-01.jpg',
+        accent: '#c6ff7f',
+        links: [
+          { label: 'Planes y servicios', action: 'benefits' },
+          { label: 'Registrar empresa', action: 'register' },
+        ],
+      },
+      {
+        id: 'buyers',
+        tag: 'Buscar proveedor',
+        title: 'Explora fabricantes confiables en toda LATAM',
+        description: 'Centraliza tus búsquedas de productos, valida certificaciones y cierra acuerdos desde un único lugar.',
+        image: '/assets/landing/hero-slide-02.jpg',
+        accent: '#b3ffe4',
+        links: [
+          { label: 'Ver catálogo', action: 'catalog' },
+          { label: 'Contactar al equipo', action: 'contact' },
+        ],
+      },
+      {
+        id: 'platform',
+        tag: 'Planes y beneficios',
+        title: 'Opera tu marketplace local con la plataforma Drokex',
+        description: 'Automatizamos onboarding, pagos multi-moneda y logística transfronteriza con analítica en tiempo real.',
+        image: '/assets/landing/hero-slide-02.jpg',
+        accent: '#ffe36b',
+        links: [
+          { label: 'Ver funcionalidades', action: 'features' },
+          { label: 'Solicitar demo', action: 'register' },
+        ],
+      },
+    ],
+    []
+  );
+
+  const heroPills = useMemo(
+    () => [
+      {
+        title: 'Expansión Internacional',
+        description: 'Llegamos a 12 países con hubs locales y presencia regulatoria.',
+      },
+      {
+        title: 'Transacciones Seguras',
+        description: 'Escrow, financiamiento y seguimiento logístico integrado.',
+      },
+      {
+        title: 'Onboarding Acompañado',
+        description: 'Aceleramos tu registro con plantillas, asesoría y automatizaciones.',
+      },
+    ],
+    []
+  );
+
+  const heroStats = useMemo(
+    () => [
+      { value: '1.2K+', label: 'Empresas conectadas' },
+      { value: '12', label: 'Marketplaces activos en LATAM' },
+      { value: '98%', label: 'Operaciones exitosas' },
+    ],
+    []
+  );
+
+  const heroCtas = useMemo(
+    () => [
+      {
+        label: heroCTA || 'Registrar mi Empresa',
+        action: () => navigate('/register'),
+        variant: 'primary' as const,
+        sx: { fontSize: '1.05rem', px: 4, py: 1.4, backgroundColor: 'white', color: drokexColors.primary },
+      },
+      {
+        label: 'Buscar Proveedores',
+        action: () => navigate('/catalog'),
+        variant: 'outline' as const,
+        sx: { fontSize: '1.05rem', px: 4, py: 1.4, borderColor: 'rgba(255,255,255,0.7)', color: 'white' },
+      },
+      {
+        label: 'Registrarme como Comprador',
+        action: () => navigate('/signup'),
+        variant: 'ghost' as const,
+        sx: { fontSize: '1.05rem', px: 4, py: 1.4, color: 'white' },
+      },
+    ],
+    [heroCTA, navigate]
+  );
+
+  const scrollToSection = (sectionRef: React.RefObject<HTMLDivElement>) => {
+    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleSlideLink = (action: HeroLinkAction) => {
+    switch (action) {
+      case 'benefits':
+        scrollToSection(benefitsRef);
+        break;
+      case 'features':
+        scrollToSection(featuresRef);
+        break;
+      case 'contact':
+        scrollToSection(leadFormRef);
+        break;
+      case 'catalog':
+        navigate('/catalog');
+        break;
+      case 'register':
+        navigate('/register-choice');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleHeroSlide = (direction: 'prev' | 'next') => {
+    setHeroSlideIndex(prev => {
+      if (direction === 'prev') {
+        return prev === 0 ? heroSlides.length - 1 : prev - 1;
+      }
+      return prev === heroSlides.length - 1 ? 0 : prev + 1;
+    });
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroSlideIndex(prev => (prev === heroSlides.length - 1 ? 0 : prev + 1));
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
+
+  const currentSlide = heroSlides[heroSlideIndex];
+
+  useEffect(() => {
+    if (!heroVisualRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        '.lp-hero-slide-content',
+        { opacity: 0, x: 40 },
+        { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out' }
+      );
+
+      gsap.from('.lp-hero-link', {
+        opacity: 0,
+        x: -20,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: 'power2.out',
+        delay: 0.2,
+      });
+    }, heroVisualRef);
+
+    return () => ctx.revert();
+  }, [heroSlideIndex]);
+
+  useEffect(() => {
+    if (!heroVisualRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.to('.lp-hero-link', {
+        y: 8,
+        repeat: -1,
+        yoyo: true,
+        duration: 3,
+        ease: 'sine.inOut',
+        stagger: 0.25,
+      });
+    }, heroVisualRef);
+
+    return () => ctx.revert();
+  }, []);
   useEffect(() => {
     (async () => {
       try {
@@ -102,8 +296,89 @@ const LandingPage: React.FC = () => {
       } catch {}
     })();
   }, []);
-  const navigate = useNavigate();
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+  }, []);
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap
+        .timeline()
+        .from('.hero-animate', { opacity: 0, y: 30, duration: 0.8, stagger: 0.15 })
+        .from('.hero-stat-card', { opacity: 0, y: 20, duration: 0.6, stagger: 0.1 }, '-=0.5');
+
+      gsap.utils.toArray<HTMLElement>('.hero-floating').forEach((el, index) => {
+        gsap.to(el, {
+          y: index % 2 === 0 ? 18 : -18,
+          x: index % 2 === 0 ? 12 : -12,
+          duration: 4 + index,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        });
+      });
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (!benefitsRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from('.lp-benefit', {
+        scrollTrigger: {
+          trigger: benefitsRef.current,
+          start: 'top 80%',
+        },
+        y: 40,
+        opacity: 0,
+        stagger: 0.2,
+        duration: 0.6,
+        ease: 'power2.out',
+      });
+    }, benefitsRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (!featuresRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from('.lp-feature-card', {
+        scrollTrigger: {
+          trigger: featuresRef.current,
+          start: 'top 75%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.15,
+        ease: 'power2.out',
+      });
+    }, featuresRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (!leadFormRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from('.lp-lead-card', {
+        scrollTrigger: {
+          trigger: leadFormRef.current,
+          start: 'top 75%',
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power2.out',
+      });
+    }, leadFormRef);
+
+    return () => ctx.revert();
+  }, []);
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -219,142 +494,389 @@ const LandingPage: React.FC = () => {
     <Box sx={{ backgroundColor: drokexColors.light, minHeight: '100vh' }}>
       {/* Public Navbar consistent with brand */}
       <PublicNavbar />
-      {/* Hero Section con Degradado y video opcional */}
-      <Box sx={{ position: 'relative' }}>
+      {/* Hero Section con elementos animados */}
+      <Box
+        ref={heroRef}
+        sx={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: heroVideoUrl
+            ? undefined
+            : 'linear-gradient(120deg, #0b3b25 0%, #0f6925 55%, #04150d 100%)',
+          color: 'white',
+        }}
+      >
         {heroVideoUrl && (
           <Box sx={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
-            <Box component="video" src={heroVideoUrl} poster={heroVideoPoster} autoPlay muted loop playsInline preload="metadata" sx={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.5)' }} />
+            <Box
+              component="video"
+              src={heroVideoUrl}
+              poster={heroVideoPoster}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              sx={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.4)' }}
+            />
           </Box>
         )}
-        <DrokexPattern pattern="gradient" opacity={heroVideoUrl ? 0.4 : 1}>
-        <Container maxWidth="lg" sx={{ pt: 8, pb: 10, textAlign: 'center', position: 'relative', zIndex: 1 }} ref={heroRef}>
-          <Box sx={{ position: 'relative', mb: 4 }} className="lp-hero-logo">
-            <BitsParallax strength={24} sx={{ position: 'absolute', top: -16, left: '15%', zIndex: 0, opacity: 0.18 }}>
-              <Box sx={{ width: 120, height: 120, borderRadius: '50%', background: 'white' }} />
-            </BitsParallax>
-            <BitsParallax strength={-16} sx={{ position: 'absolute', top: -8, right: '18%', zIndex: 0, opacity: 0.18 }}>
-              <Box sx={{ width: 80, height: 80, borderRadius: 2, background: 'white', transform: 'rotate(12deg)' }} />
-            </BitsParallax>
-            <Box sx={{ position: 'relative', zIndex: 1 }}>
-              <DrokexLogo variant="full" size="large" color="white" />
-            </Box>
-          </Box>
+        <Box
+          className="hero-floating"
+          sx={{
+            position: 'absolute',
+            top: -80,
+            left: '10%',
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.35), transparent 60%)',
+            opacity: 0.6,
+            zIndex: 0,
+          }}
+        />
+        <Box
+          className="hero-floating"
+          sx={{
+            position: 'absolute',
+            bottom: -120,
+            right: '5%',
+            width: 260,
+            height: 260,
+            borderRadius: '45%',
+            background: 'radial-gradient(circle, rgba(14,111,55,0.8), transparent 70%)',
+            opacity: 0.9,
+            filter: 'blur(2px)',
+            zIndex: 0,
+          }}
+        />
+        <Container maxWidth="lg" sx={{ pt: 8, pb: 10, position: 'relative', zIndex: 1 }}>
+          <Grid container spacing={6} alignItems="center">
+            <Grid item xs={12} md={6}>
+              
+              {(() => {
+                const country = tenant?.country;
+                const currencyLabel = tenant?.currencySymbol || tenant?.currency;
+                if (!country || !currencyLabel) return null;
+                return (
+                  <Tooltip title={`Región del marketplace y su moneda (${currencyLabel})`}>
+                    <Chip
+                      label={`${getCountryFlag()} ${country} • Moneda: ${currencyLabel}`}
+                      sx={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        color: 'white',
+                        mb: 2,
+                        fontSize: '0.95rem',
+                        fontWeight: 600,
+                      }}
+                      className="hero-animate"
+                    />
+                  </Tooltip>
+                );
+              })()}
 
-          {(() => {
-            const country = tenant?.country;
-            const currencyLabel = tenant?.currencySymbol || tenant?.currency;
-            if (!country || !currencyLabel) return null;
-            return (
-              <Tooltip title={`Región del marketplace y su moneda (${currencyLabel})`}>
-                <Chip
-                  label={`${getCountryFlag()} ${country} • Moneda: ${currencyLabel}`}
-                  sx={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    mb: 3,
-                    fontSize: '1rem',
-                    fontWeight: 600,
+              <Typography
+                variant="h2"
+                sx={{
+                  mb: 2,
+                  fontWeight: 500,
+                  fontSize: { xs: '2.1rem', md: '3.25rem' },
+                  color: 'white',
+                  textShadow: '0 18px 70px rgba(0,0,0,0.45)',
+                }}
+                className="hero-animate"
+              >
+                {heroTitle}
+              </Typography>
+
+              <Typography
+                variant="h5"
+                sx={{
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  mb: 3,
+                  fontWeight: 300,
+                  lineHeight: 1.7,
+                }}
+                className="hero-animate"
+              >
+                {heroSubtitle}
+              </Typography>
+
+              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }} className="hero-animate hero-cta">
+                {heroCtas.map(cta => (
+                  <BitsTilt key={cta.label}>
+                    <DrokexButton variant={cta.variant} size="large" onClick={cta.action} sx={cta.sx}>
+                      {cta.label}
+                    </DrokexButton>
+                  </BitsTilt>
+                ))}
+              </Box>
+
+              <Paper
+                component="form"
+                onSubmit={(e: any) => {
+                  e.preventDefault();
+                  const v = (e.target?.query?.value || '').trim();
+                  navigate(`/catalog${v ? `?search=${encodeURIComponent(v)}` : ''}`);
+                }}
+                sx={{
+                  p: 1.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  backgroundColor: 'rgba(255,255,255,0.95)',
+                  borderRadius: 4,
+                  boxShadow: '0 25px 80px rgba(0,0,0,0.35)',
+                }}
+                className="hero-animate"
+              >
+                <TextField
+                  name="query"
+                  placeholder="Buscar productos o empresas…"
+                  variant="standard"
+                  fullWidth
+                  InputProps={{
+                    disableUnderline: true,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: drokexColors.secondary }} />
+                      </InputAdornment>
+                    ),
+                    sx: { px: 1 },
                   }}
-                  className="lp-hero-chip"
                 />
-              </Tooltip>
-            );
-          })()}
+                <DrokexButton type="submit" variant="primary" sx={{ ml: 1 }}>
+                  Buscar
+                </DrokexButton>
+              </Paper>
 
-          <Typography
-            variant="h2"
-            sx={{
-              color: 'white',
-              mb: 3,
-              fontWeight: 400,
-              fontSize: { xs: '2rem', md: '3rem' },
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-            }}
-            className="lp-hero-title"
-          >
-            {heroTitle}
-          </Typography>
+              <Grid container spacing={2} sx={{ mt: 2 }} className="hero-animate">
+                {heroPills.map(pill => (
+                  <Grid item xs={12} sm={4} key={pill.title}>
+                    <Box
+                      sx={{
+                        backgroundColor: 'rgba(255,255,255,0.08)',
+                        borderRadius: 3,
+                        p: 2,
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        minHeight: 120,
+                      }}
+                      className="hero-pill"
+                    >
+                      <Typography variant="subtitle1" sx={{ color: 'white', mb: 0.5, fontWeight: 500 }}>
+                        {pill.title}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)' }}>
+                        {pill.description}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
 
-          <Typography
-            variant="h5"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.9)',
-              mb: 4,
-              fontWeight: 400,
-              lineHeight: 1.6,
-              maxWidth: '800px',
-              mx: 'auto',
-            }}
-            className="lp-hero-subtitle"
-          >
-            {heroSubtitle}
-          </Typography>
+              <Box sx={{ mt: 4 }} className="hero-animate">
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    backgroundColor: 'rgba(5,18,12,0.6)',
+                    borderRadius: 999,
+                    px: 2,
+                    py: 1,
+                    border: '1px solid rgba(255,255,255,0.2)',
+                  }}
+                >
+                  <IconButton size="small" onClick={() => handleHeroSlide('prev')} sx={{ color: 'white' }}>
+                    <ChevronLeft />
+                  </IconButton>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontWeight: 600, fontSize: '0.95rem' }}>{currentSlide.title}</Typography>
+                    <Typography sx={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.85)' }}>
+                      {currentSlide.description}
+                    </Typography>
+                  </Box>
+                  <IconButton size="small" onClick={() => handleHeroSlide('next')} sx={{ color: 'white' }}>
+                    <ChevronRight />
+                  </IconButton>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
+                  {heroSlides.map((_, index) => (
+                    <Box
+                      key={`hero-slide-${index}`}
+                      sx={{
+                        width: index === heroSlideIndex ? 18 : 12,
+                        height: 12,
+                        borderRadius: 999,
+                        backgroundColor: index === heroSlideIndex ? 'white' : 'rgba(255,255,255,0.4)',
+                        transition: 'all 0.3s ease',
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
 
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }} className="lp-hero-cta">
-            <BitsTilt>
-              <DrokexButton
-                variant="primary"
-                size="large"
-                onClick={() => navigate('/register')}
-                sx={{ fontSize: '1.1rem', px: 4, py: 1.5, backgroundColor: 'white', color: drokexColors.primary }}
+            <Grid item xs={12} md={6}>
+              <Box
+                ref={heroVisualRef}
+                sx={{
+                  position: 'relative',
+                  borderRadius: 4,
+                  p: { xs: 0, md: 1.5 },
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  boxShadow: '0 30px 80px rgba(0,0,0,0.4)',
+                  overflow: 'hidden',
+                }}
+                className="hero-animate hero-visual"
               >
-                Quiero vender (Proveedor)
-              </DrokexButton>
-            </BitsTilt>
+                <Box
+                  key={currentSlide.id}
+                  className="lp-hero-slide-content"
+                  sx={{
+                    position: 'relative',
+                    minHeight: { xs: 360, md: 460 },
+                    borderRadius: { xs: 0, md: 3 },
+                    overflow: 'hidden',
+                    backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.15)), url(${currentSlide.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(180deg, rgba(4, 21, 13, 0.55) 0%, rgba(4, 21, 13, 0.95) 75%)',
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      zIndex: 1,
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 2,
+                      p: { xs: 3, md: 4 },
+                    }}
+                  >
+                    <Chip
+                      icon={<LocationOn sx={{ color: drokexColors.secondary }} />}
+                      label={currentSlide.tag}
+                      sx={{
+                        alignSelf: 'flex-start',
+                        backgroundColor: 'rgba(255,255,255,0.9)',
+                        color: drokexColors.dark,
+                        fontWeight: 600,
+                        borderRadius: 999,
+                        px: 1.5,
+                      }}
+                    />
+                    <Typography variant="h4" sx={{ color: 'white', fontWeight: 600, lineHeight: 1.3 }}>
+                      {currentSlide.title}
+                    </Typography>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>
+                      {currentSlide.description}
+                    </Typography>
+                    <List dense sx={{ color: 'white', py: 0 }}>
+                      {features.slice(0, 3).map(item => (
+                        <ListItem key={`${currentSlide.id}-${item}`} sx={{ px: 0, py: 0.5 }}>
+                          <ListItemIcon sx={{ minWidth: 34 }}>
+                            <CheckCircle sx={{ color: currentSlide.accent, fontSize: 22 }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={item}
+                            primaryTypographyProps={{
+                              fontSize: '0.95rem',
+                              color: 'rgba(255,255,255,0.95)',
+                            }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      {currentSlide.links.map(link => (
+                        <Chip
+                          key={`${currentSlide.id}-${link.label}`}
+                          label={link.label}
+                          onClick={() => handleSlideLink(link.action)}
+                          clickable
+                          className="lp-hero-link"
+                          sx={{
+                            backgroundColor: 'rgba(255,255,255,0.15)',
+                            color: 'white',
+                            border: '1px solid rgba(255,255,255,0.4)',
+                            borderRadius: 999,
+                            fontWeight: 500,
+                            px: 2,
+                          }}
+                        />
+                      ))}
+                    </Box>
+                    <Box
+                      sx={{
+                        mt: 'auto',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 2,
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                          sx={{
+                            width: 12,
+                            height: 12,
+                            borderRadius: '50%',
+                            backgroundColor: currentSlide.accent,
+                            boxShadow: `0 0 12px ${currentSlide.accent}`,
+                          }}
+                        />
+                        <Typography sx={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)' }}>
+                          Cobertura LATAM • Hub digital
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        {heroSlides.map((slide, index) => (
+                          <Box
+                            key={slide.id}
+                            sx={{
+                              width: index === heroSlideIndex ? 30 : 12,
+                              height: 12,
+                              borderRadius: 999,
+                              backgroundColor:
+                                index === heroSlideIndex ? currentSlide.accent : 'rgba(255,255,255,0.35)',
+                              transition: 'all 0.3s ease',
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
 
-            <BitsTilt>
-              <DrokexButton
-                variant="outline"
-                size="large"
-                onClick={() => navigate('/catalog')}
-                sx={{ fontSize: '1.1rem', px: 4, py: 1.5, borderColor: 'white', color: 'white' }}
-              >
-                Buscar Proveedores
-              </DrokexButton>
-            </BitsTilt>
-
-            <BitsTilt>
-              <DrokexButton
-                variant="ghost"
-                size="large"
-                onClick={() => navigate('/signup')}
-                sx={{ fontSize: '1.1rem', px: 4, py: 1.5, color: 'white' }}
-              >
-                Registrarme como Comprador
-              </DrokexButton>
-            </BitsTilt>
-          </Box>
-
-          {/* Buscador rápido en el hero */}
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Paper
-              component="form"
-              onSubmit={(e: any) => {
-                e.preventDefault();
-                const v = (e.target?.query?.value || '').trim();
-                navigate(`/catalog${v ? `?search=${encodeURIComponent(v)}` : ''}`);
-              }}
-              sx={{
-                p: 1,
-                display: 'flex',
-                alignItems: 'center',
-                width: { xs: '100%', sm: 520 },
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                borderRadius: 3,
-              }}
-            >
-              <TextField
-                name="query"
-                placeholder="Buscar productos o empresas…"
-                variant="standard"
-                fullWidth
-                InputProps={{ disableUnderline: true, sx: { px: 1 } }}
-              />
-              <DrokexButton type="submit" variant="primary" sx={{ ml: 1 }}>Buscar</DrokexButton>
-            </Paper>
-          </Box>
+          <Grid container spacing={3} sx={{ mt: { xs: 6, md: 8 } }}>
+            {heroStats.map(stat => (
+              <Grid item xs={12} sm={4} key={stat.label}>
+                <DrokexCard variant="interactive" sx={{ height: '100%' }} className="hero-stat-card">
+                  <DrokexCardContent>
+                    <Typography variant="h4" sx={{ color: drokexColors.primary, mb: 1, fontWeight: 600 }}>
+                      {stat.value}
+                    </Typography>
+                    <Typography variant="subtitle1" sx={{ color: drokexColors.dark }}>
+                      {stat.label}
+                    </Typography>
+                  </DrokexCardContent>
+                </DrokexCard>
+              </Grid>
+            ))}
+          </Grid>
         </Container>
-        </DrokexPattern>
       </Box>
 
       {/* Sección de Beneficios */}
@@ -499,7 +1021,7 @@ const LandingPage: React.FC = () => {
 
             <Grid item xs={12} md={6}>
               <BitsReveal effect="left">
-                <DrokexCard variant="bordered" borderColor="primary">
+                <DrokexCard variant="bordered" borderColor="primary" className="lp-feature-card">
                   <DrokexCardContent>
                     <Typography
                       variant="h6"
