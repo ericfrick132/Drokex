@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Dockex.API.props" />
-</Project>
