@@ -26,10 +26,10 @@ const About: React.FC = () => {
     },
     {
       name: 'Andrés',
-      lastName: 'García',
+      lastName: 'Carrillo Ávila',
       role: 'EMPRESARIO',
-      image: '/assets/team-andres.svg',
-      description: `Andrés García es un empresario visionario con más de 15 años de experiencia en comercio internacional. Especializado en desarrollo de mercados emergentes y estrategias de expansión global. Ha liderado proyectos de exportación exitosos conectando empresas latinoamericanas con compradores europeos y asiáticos, generando millones en ventas internacionales.`
+      image: '/assets/perfil_andres.jpeg',
+      description: `Empresario colombiano con más de 25 años de trayectoria en la creación y desarrollo de marcas, proyectos empresariales y oportunidades comerciales en distintos países de Latinoamérica. Su experiencia se ha construido principalmente a partir de iniciativas propias, liderando negocios desde su concepción con inversión y riesgo empresarial directo, combinando visión empresarial, creatividad y estrategias de marketing para el desarrollo y posicionamiento de proyectos./n Como cofundador de Drokex, aporta su experiencia en desarrollo empresarial, marketing digital y apertura de mercados en Latinoamérica, especialmente en Centroamérica y el Caribe, contribuyendo a conectar empresas, proveedores y nuevas oportunidades comerciales en la región.`
     },
     {
       name: 'Luis',
