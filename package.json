@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "framer-motion": "^12.35.2",
     "react-bits": "github:DavidHDev/react-bits"
   }
 }

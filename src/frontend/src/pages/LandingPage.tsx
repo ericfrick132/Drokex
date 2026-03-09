@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Box,
   Typography,
@@ -37,11 +38,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTenant } from '../contexts/TenantContext';
 import { leadsApi, tenantsApi, geoApi } from '../services/api';
 import {
-  DrokexLogo,
-  DrokexButton, 
-  DrokexCard, 
+  DrokexButton,
+  DrokexCard,
   DrokexCardContent,
-  DrokexPattern 
+  DrokexPattern
 } from '../components/common';
 import { drokexColors } from '../theme/drokexTheme';
 import PublicNavbar from '../components/layout/PublicNavbar';
@@ -72,6 +72,65 @@ interface HeroSlide {
   links: { label: string; action: HeroLinkAction }[];
 }
 
+interface HeroRobotTransitionProps {
+  isProvider: boolean;
+}
+
+const HeroRobotTransition: React.FC<HeroRobotTransitionProps> = ({ isProvider }) => {
+  const robotImage = isProvider ? '/assets/robot-verde.png' : '/assets/robot-naranja.png';
+  const shadowColor = isProvider ? drokexColors.primary : '#ff8a00';
+
+  return (
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 'auto',
+      height: '75vh',
+      position: 'relative',
+      mx: 16
+    }}>
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={isProvider ? 'provider-robot' : 'buyer-robot'}
+          src={robotImage}
+          alt={isProvider ? 'Robot Proveedor Verde' : 'Robot Comprador Naranja'}
+          initial={{
+            opacity: 0,
+            x: isProvider ? 20 : -20,
+            filter: 'blur(8px)',
+            scale: 0.7
+          }}
+          animate={{
+            opacity: 1,
+            x: 0,
+            filter: 'blur(0px)',
+            scale: 1
+          }}
+          exit={{
+            opacity: 0,
+            x: isProvider ? -20 : 20,
+            filter: 'blur(8px)',
+            scale: 0.7
+          }}
+          transition={{
+            duration: 0.25,
+            ease: 'easeInOut'
+          }}
+          style={{
+            height: '75vh',
+            width: 'auto',
+            filter: `drop-shadow(0 12px 40px ${shadowColor}60)`,
+            maxHeight: '75vh',
+            objectFit: 'contain',
+            position: 'absolute'
+          }}
+        />
+      </AnimatePresence>
+    </Box>
+  );
+};
+
 const LandingPage: React.FC = () => {
   const heroRef = useRef<HTMLDivElement | null>(null);
   const heroVisualRef = useRef<HTMLDivElement | null>(null);
@@ -94,12 +153,13 @@ const LandingPage: React.FC = () => {
   const { tenant, getCountryFlag } = useTenant();
   const [heroTitle, setHeroTitle] = useState('Conectando Empresas de LATAM con el Mundo');
   const [heroSubtitle, setHeroSubtitle] = useState('La plataforma que facilita la expansión comercial de empresas latinoamericanas hacia mercados internacionales, sin necesidad de presencia física.');
-  const [heroCTA, setHeroCTA] = useState('Registrar mi Empresa');
+  const [heroCTA, setHeroCTA] = useState('Quiero vender productos');
   const [heroVideoUrl, setHeroVideoUrl] = useState<string | undefined>(undefined);
   const [heroVideoPoster, setHeroVideoPoster] = useState<string | undefined>(undefined);
   const [coverage, setCoverage] = useState<{ countryCode: string; country: string; tenants: number }[]>([]);
   const navigate = useNavigate();
   const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const [hoveredButton, setHoveredButton] = useState<'provider' | 'buyer' | null>(null);
 
   const heroSlides = useMemo<HeroSlide[]>(
     () => [
@@ -112,7 +172,7 @@ const LandingPage: React.FC = () => {
         accent: '#c6ff7f',
         links: [
           { label: 'Planes y servicios', action: 'benefits' },
-          { label: 'Registrar empresa', action: 'register' },
+          { label: 'Quiero vender productos', action: 'register' },
         ],
       },
       {
@@ -173,7 +233,7 @@ const LandingPage: React.FC = () => {
   const heroCtas = useMemo(
     () => [
       {
-        label: heroCTA || 'Registrar mi Empresa',
+        label: heroCTA || 'Quiero vender productos',
         action: () => navigate('/register'),
         variant: 'primary' as const,
         sx: { fontSize: '1.05rem', px: 4, py: 1.4, backgroundColor: 'white', color: drokexColors.primary },
@@ -507,8 +567,28 @@ const LandingPage: React.FC = () => {
           overflow: 'hidden',
           background: heroVideoUrl
             ? undefined
-            : 'linear-gradient(120deg, #0b3b25 0%, #0f6925 55%, #04150d 100%)',
+            : hoveredButton === 'buyer'
+            ? 'radial-gradient(ellipse at center, #2a1f0f 0%, #1a0f05 70%, #0f0703 100%)'
+            : 'radial-gradient(ellipse at center, #0b3b25 0%, #04150d 70%, #021007 100%)',
           color: 'white',
+          transition: 'all 0.25s ease-in-out',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: hoveredButton === 'buyer'
+              ? 'url(/assets/triangulo-naranja.png)'
+              : 'url(/assets/triangulo-verde.png)',
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.3,
+            zIndex: 1,
+            transition: 'all 0.25s ease-in-out',
+          }
         }}
       >
         {heroVideoUrl && (
@@ -554,9 +634,9 @@ const LandingPage: React.FC = () => {
             zIndex: 0,
           }}
         />
-        <Container maxWidth="lg" sx={{ pt: 8, pb: 10, position: 'relative', zIndex: 1 }}>
-          <Grid container spacing={6} alignItems="center">
-            <Grid item xs={12} md={6}>
+        <Container maxWidth="lg" sx={{ pt: 8, pb: 10, position: 'relative', zIndex: 2 }}>
+          <Grid container spacing={6} alignItems="center" justifyContent="center">
+            <Grid item xs={12}>
               
               {(() => {
                 const country = tenant?.country;
@@ -579,7 +659,7 @@ const LandingPage: React.FC = () => {
                 );
               })()}
 
-              <Typography
+              {/* <Typography
                 variant="h2"
                 sx={{
                   mb: 2,
@@ -604,55 +684,161 @@ const LandingPage: React.FC = () => {
                 className="hero-animate"
               >
                 {heroSubtitle}
-              </Typography>
+              </Typography> */}
 
-              <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mb: 3 }} className="hero-animate hero-cta">
-                {heroCtas.map(cta => (
-                  <BitsTilt key={cta.label}>
-                    <DrokexButton variant={cta.variant} size="large" onClick={cta.action} sx={cta.sx}>
-                      {cta.label}
-                    </DrokexButton>
-                  </BitsTilt>
-                ))}
+              {/* Centered Search Bar */}
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }} className="hero-animate">
+                <Paper
+                  component="form"
+                  onSubmit={(e: any) => {
+                    e.preventDefault();
+                    const v = (e.target?.query?.value || '').trim();
+                    navigate(`/catalog${v ? `?search=${encodeURIComponent(v)}` : ''}`);
+                  }}
+                  sx={{
+                    p: 1.5,
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    maxWidth: '600px',
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    borderRadius: 4,
+                    boxShadow: '0 25px 80px rgba(0,0,0,0.35)',
+                    my: 2,
+                  }}
+                >
+                  <TextField
+                    name="query"
+                    placeholder="Buscar productos y empresas…"
+                    variant="standard"
+                    fullWidth
+                    InputProps={{
+                      disableUnderline: true,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Search sx={{ color: drokexColors.secondary }} />
+                        </InputAdornment>
+                      ),
+                      sx: { px: 1 },
+                    }}
+                  />
+                  <DrokexButton type="submit" variant="primary" sx={{ ml: 1 }}>
+                    Buscar
+                  </DrokexButton>
+                </Paper>
               </Box>
 
-              <Paper
-                component="form"
-                onSubmit={(e: any) => {
-                  e.preventDefault();
-                  const v = (e.target?.query?.value || '').trim();
-                  navigate(`/catalog${v ? `?search=${encodeURIComponent(v)}` : ''}`);
-                }}
-                sx={{
-                  p: 1.5,
-                  display: 'flex',
-                  alignItems: 'center',
-                  width: '100%',
-                  backgroundColor: 'rgba(255,255,255,0.95)',
-                  borderRadius: 4,
-                  boxShadow: '0 25px 80px rgba(0,0,0,0.35)',
-                }}
-                className="hero-animate"
-              >
-                <TextField
-                  name="query"
-                  placeholder="Buscar productos o empresas…"
-                  variant="standard"
-                  fullWidth
-                  InputProps={{
-                    disableUnderline: true,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search sx={{ color: drokexColors.secondary }} />
-                      </InputAdornment>
-                    ),
-                    sx: { px: 1 },
-                  }}
-                />
-                <DrokexButton type="submit" variant="primary" sx={{ ml: 1 }}>
-                  Buscar
-                </DrokexButton>
-              </Paper>
+              {/* Action Buttons with Robots */}
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 2,
+                mb: 3
+              }} className="hero-animate hero-cta">
+                <BitsTilt>
+                  <Box
+                    onClick={() => navigate('/register-choice')}
+                    sx={{
+                      minWidth: '260px',
+                      minHeight: '104px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 3,
+                      border: `3px solid ${drokexColors.primary}`,
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                      boxShadow: '0 8px 32px rgba(255, 255, 255, 0.2), inset 0 2px 8px rgba(255, 255, 255, 0.1)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: `rgba(76, 255, 146, 0.2)`,
+                        borderColor: drokexColors.secondary,
+                        transform: 'translateY(-3px)',
+                        boxShadow: `0 12px 40px rgba(76, 255, 146, 0.3), inset 0 2px 12px rgba(255, 255, 255, 0.2)`
+                      }
+                    }}
+                  >
+                    <Typography sx={{
+                      fontSize: '1.2rem',
+                      fontWeight: 800,
+                      color: 'white',
+                      letterSpacing: '1px',
+                      lineHeight: 1
+                    }}>
+                      QUIERO
+                    </Typography>
+                    <Typography sx={{
+                      fontSize: '1.05rem',
+                      fontWeight: 800,
+                      color: 'white',
+                      letterSpacing: '0.5px',
+                      lineHeight: 1,
+                      mt: 0.5
+                    }}>
+                      vender productos
+                    </Typography>
+                  </Box>
+                </BitsTilt>
+
+                {/* Robot Images as Protagonists */}
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <HeroRobotTransition isProvider={hoveredButton !== 'buyer'} />
+                </Box>
+
+                <BitsTilt>
+                  <Box
+                    onClick={() => navigate('/catalog')}
+                    onMouseEnter={() => setHoveredButton('buyer')}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    sx={{
+                      minWidth: '260px',
+                      minHeight: '104px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: 3,
+                      border: '3px solid #ff8a00',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                      boxShadow: '0 8px 32px rgba(255, 255, 255, 0.2), inset 0 2px 8px rgba(255, 255, 255, 0.1)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 138, 0, 0.2)',
+                        borderColor: '#ffaa33',
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 12px 40px rgba(255, 138, 0, 0.3), inset 0 2px 12px rgba(255, 255, 255, 0.2)'
+                      }
+                    }}
+                  >
+                    <Typography sx={{
+                      fontSize: '1.2rem',
+                      fontWeight: 800,
+                      color: 'white',
+                      letterSpacing: '1px',
+                      lineHeight: 1
+                    }}>
+                      QUIERO
+                    </Typography>
+                    <Typography sx={{
+                      fontSize: '1.05rem',
+                      fontWeight: 800,
+                      color: 'white',
+                      letterSpacing: '0.5px',
+                      lineHeight: 1,
+                      mt: 0.5
+                    }}>
+                      buscar proveedor
+                    </Typography>
+                  </Box>
+                </BitsTilt>
+              </Box>
 
               <Grid container spacing={2} sx={{ mt: 2 }} className="hero-animate">
                 {heroPills.map(pill => (
@@ -721,7 +907,8 @@ const LandingPage: React.FC = () => {
               </Box>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            {/* Hidden visual grid - keeping for future reference */}
+            <Grid item xs={12} md={6} sx={{ display: 'none' }}>
               <Box
                 ref={heroVisualRef}
                 sx={{
@@ -743,9 +930,6 @@ const LandingPage: React.FC = () => {
                     minHeight: { xs: 360, md: 460 },
                     borderRadius: { xs: 0, md: 3 },
                     overflow: 'hidden',
-                    backgroundImage: `linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.15)), url(${currentSlide.image})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
                   }}
                 >
                   <Box
@@ -800,8 +984,8 @@ const LandingPage: React.FC = () => {
                         </ListItem>
                       ))}
                     </List>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                      {currentSlide.links.map(link => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, position: 'relative', alignItems: 'center', justifyContent: 'center', minHeight: '60px' }}>
+                      {currentSlide.links.map((link, index) => (
                         <Chip
                           key={`${currentSlide.id}-${link.label}`}
                           label={link.label}
@@ -815,9 +999,15 @@ const LandingPage: React.FC = () => {
                             borderRadius: 999,
                             fontWeight: 500,
                             px: 2,
+                            order: index === 0 ? 1 : 3, // Primer botón a la izquierda, segundo a la derecha
                           }}
                         />
                       ))}
+
+                      {/* Robot en el centro entre los botones */}
+                      <Box sx={{ order: 2, mx: 2 }}>
+                        <HeroRobotTransition isProvider={heroSlideIndex === 0} />
+                      </Box>
                     </Box>
                     <Box
                       sx={{
