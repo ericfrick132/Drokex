@@ -8,7 +8,7 @@ const PublicNavbar: React.FC = () => {
   const navigate = useNavigate();
 
   const linkSx = {
-    color: '#ffffff',
+    color: '#000000',
     fontWeight: 500,
     fontSize: '0.95rem',
     textDecoration: 'none',
@@ -17,17 +17,20 @@ const PublicNavbar: React.FC = () => {
   } as const;
 
   return (
-    <AppBar position="sticky" elevation={0} sx={{ backgroundColor: drokexColors.dark, borderBottom: `1px solid rgba(255,255,255,0.08)`, position: 'relative' }}>
+    <AppBar position="sticky" elevation={0} sx={{ backgroundColor: '#ffffff', borderBottom: `1px solid rgba(0,0,0,0.08)`, position: 'relative' }}>
       <Toolbar sx={{ minHeight: 56, display: 'flex', alignItems: 'center' }}>
-        {/* Brand */}
+        {/* Brand - Left */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Box onClick={() => navigate('/')} sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            <DrokexLogo variant="full" size="medium" color="white" withMargin={false} />
+            <img src="/assets/logo-entero-negro.png" alt="Drokex Logo" style={{ height: '40px', cursor: 'pointer' }} />
           </Box>
         </Box>
 
-        {/* Left nav */}
-        <Box sx={{ ml: 3, display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+        {/* Spacer */}
+        <Box sx={{ flexGrow: 1 }} />
+
+        {/* Navigation Links - Right */}
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', mr: 3 }}>
           <Link href="#servicios" sx={linkSx}>
             Servicios
           </Link>
@@ -38,7 +41,7 @@ const PublicNavbar: React.FC = () => {
             Beneficios
           </Link>
           <Link href="/about" sx={linkSx}>
-            Quiénes somos
+            Sobre nosotros
           </Link>
           <Link href="/catalog" sx={linkSx}>
             Productos
@@ -48,13 +51,13 @@ const PublicNavbar: React.FC = () => {
           </Link>
         </Box>
 
-        {/* Right actions */}
-        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* Action Buttons - Far Right */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Button
             color="inherit"
             onClick={() => navigate('/login')}
             sx={{
-              color: '#ffffff',
+              color: '#000000',
               textTransform: 'none',
               '&:hover': { color: drokexColors.primary, backgroundColor: 'transparent' },
             }}
@@ -66,7 +69,7 @@ const PublicNavbar: React.FC = () => {
             onClick={() => navigate('/register-choice')}
             sx={{
               backgroundColor: drokexColors.primary,
-              color: drokexColors.dark,
+              color: '#ffffff',
               textTransform: 'none',
               '&:hover': { backgroundColor: drokexColors.secondary, color: '#ffffff' },
             }}

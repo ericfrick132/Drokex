@@ -30,14 +30,15 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  Menu,
+  Message,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTenant } from '../contexts/TenantContext';
 import { leadsApi, tenantsApi, geoApi } from '../services/api';
-import { 
-  DrokexLogo, 
+import {
+  DrokexLogo,
   DrokexButton, 
-  DrokexInput, 
   DrokexCard, 
   DrokexCardContent,
   DrokexPattern 
@@ -492,8 +493,12 @@ const LandingPage: React.FC = () => {
 
   return (
     <Box sx={{ backgroundColor: drokexColors.light, minHeight: '100vh' }}>
-      {/* Public Navbar consistent with brand */}
-      <PublicNavbar />
+      {/* Public Navbar consistent with brand - Sticky Header */}
+      <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1100 }}>
+        <PublicNavbar />
+      </Box>
+      {/* Espaciado para compensar el navbar fijo */}
+      {/* <Box sx={{ height: '80px' }}></Box> */}
       {/* Hero Section con elementos animados */}
       <Box
         ref={heroRef}
@@ -545,7 +550,6 @@ const LandingPage: React.FC = () => {
             height: 260,
             borderRadius: '45%',
             background: 'radial-gradient(circle, rgba(14,111,55,0.8), transparent 70%)',
-            opacity: 0.9,
             filter: 'blur(2px)',
             zIndex: 0,
           }}
@@ -1058,19 +1062,27 @@ const LandingPage: React.FC = () => {
         </Container>
       </Box>
 
-      {/* Formulario de Captación de Leads */}
-      <DrokexPattern pattern="arrows" opacity={0.05}>
-        <Container id="servicios" maxWidth="md" sx={{ py: 8 }} ref={leadFormRef}>
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
+      {/* Sección de Contacto */}
+      <Box sx={{
+        backgroundColor: '#f8f9fa',
+        py: 8,
+        position: 'relative',
+        overflow: 'hidden',
+        minHeight: '600px'
+      }}>
+        <Container id="contacto" maxWidth="xl" ref={leadFormRef}>
+          {/* Título Principal */}
+          <Box sx={{ textAlign: 'left', mb: 6 }}>
             <Typography
-              variant="h3"
+              variant="h2"
               sx={{
                 mb: 2,
                 color: drokexColors.dark,
-                fontWeight: 400,
+                fontWeight: 500,
+                fontSize: { xs: '1.5rem', md: '2rem' }
               }}
             >
-              ¿Listo para Expandir tu Negocio?
+              Contáctanos
             </Typography>
             <Typography
               variant="body1"
@@ -1078,119 +1090,287 @@ const LandingPage: React.FC = () => {
                 color: drokexColors.secondary,
                 fontSize: '1.1rem',
                 maxWidth: '600px',
-                mx: 'auto',
               }}
             >
-              Completa este formulario y nos pondremos en contacto contigo para comenzar tu registro
+              ¿Tienes alguna pregunta o necesitas ayuda? Llena el formulario y nos pondremos en contacto contigo muy pronto.
             </Typography>
           </Box>
 
-          <BitsReveal effect="up">
-            <DrokexCard variant="elevated">
-              <DrokexCardContent className="lp-lead-card">
-              {submitSuccess && (
-                <Alert
-                  severity="success"
-                  sx={{
-                    mb: 3,
-                    backgroundColor: drokexColors.pale,
-                    color: drokexColors.dark,
-                  }}
-                >
-                  ¡Gracias por tu interés! Nos pondremos en contacto contigo pronto.
-                </Alert>
-              )}
+          <Grid container spacing={8} sx={{ position: 'relative', zIndex: 2, minHeight: '600px' }}>
+            {/* Formulario de Contacto - Lado Izquierdo */}
+            <Grid item xs={12} lg={6}>
+              <Box sx={{ backgroundColor: 'white', p: 4, borderRadius: 3, boxShadow: 3 }}>
+                <Typography variant="h5" sx={{ mb: 3, color: drokexColors.dark, fontWeight: 400 }}>
+                  Envíanos un mensaje
+                </Typography>
 
-              <Box component="form" onSubmit={handleSubmit}>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
-                    <DrokexInput
-                      label="Nombre de la Empresa"
-                      value={leadForm.companyName}
-                      onChange={handleInputChange('companyName')}
-                      error={!!errors.companyName}
-                      helperText={errors.companyName}
-                      icon={<Business />}
-                      disabled={isSubmitting}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12} md={6}>
-                    <DrokexInput
-                      label="Nombre de Contacto"
-                      value={leadForm.contactName}
-                      onChange={handleInputChange('contactName')}
-                      error={!!errors.contactName}
-                      helperText={errors.contactName}
-                      disabled={isSubmitting}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <DrokexInput
-                      label="Correo Electrónico"
-                      type="email"
-                      value={leadForm.email}
-                      onChange={handleInputChange('email')}
-                      error={!!errors.email}
-                      helperText={errors.email}
-                      icon={<Email />}
-                      disabled={isSubmitting}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <DrokexInput
-                      label="Teléfono"
-                      value={leadForm.phone}
-                      onChange={handleInputChange('phone')}
-                      error={!!errors.phone}
-                      helperText={errors.phone}
-                      icon={<Phone />}
-                      disabled={isSubmitting}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <DrokexInput
-                      label="Productos de Interés"
-                      value={leadForm.interestedProducts}
-                      onChange={handleInputChange('interestedProducts')}
-                      placeholder="Ej: Productos agrícolas, textiles, artesanías..."
-                      disabled={isSubmitting}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <DrokexInput
-                      label="Mensaje adicional (opcional)"
-                      multiline
-                      rows={3}
-                      value={leadForm.message}
-                      onChange={handleInputChange('message')}
-                      placeholder="Cuéntanos más sobre tu empresa y objetivos de exportación..."
-                      disabled={isSubmitting}
-                    />
-                  </Grid>
-                </Grid>
-
-                <Box sx={{ mt: 4, textAlign: 'center' }}>
-                  <DrokexButton
-                    type="submit"
-                    variant="primary"
-                    size="large"
-                    loading={isSubmitting}
-                    sx={{ px: 6, py: 1.5, fontSize: '1.1rem' }}
+                {submitSuccess && (
+                  <Alert
+                    severity="success"
+                    sx={{
+                      mb: 3,
+                      backgroundColor: drokexColors.pale,
+                      color: drokexColors.dark,
+                    }}
                   >
-                    Solicitar Información
-                  </DrokexButton>
+                    ¡Gracias por tu interés! Nos pondremos en contacto contigo pronto.
+                  </Alert>
+                )}
+
+                <Box component="form" onSubmit={handleSubmit}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Nombre"
+                        value={leadForm.contactName}
+                        onChange={handleInputChange('contactName')}
+                        error={!!errors.contactName}
+                        helperText={errors.contactName}
+                        disabled={isSubmitting}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Business sx={{ color: drokexColors.primary }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: drokexColors.primary,
+                            }
+                          }
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Correo Electrónico"
+                        type="email"
+                        value={leadForm.email}
+                        onChange={handleInputChange('email')}
+                        error={!!errors.email}
+                        helperText={errors.email}
+                        disabled={isSubmitting}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Email sx={{ color: drokexColors.primary }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: drokexColors.primary,
+                            }
+                          }
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        select
+                        label="Motivo"
+                        value={leadForm.interestedProducts}
+                        onChange={handleInputChange('interestedProducts')}
+                        disabled={isSubmitting}
+                        SelectProps={{ native: true }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Menu sx={{ color: drokexColors.primary }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: drokexColors.primary,
+                            }
+                          }
+                        }}
+                      >
+                        <option value="">Selecciona un motivo</option>
+                        <option value="Información general">Información general</option>
+                        <option value="Soporte técnico">Soporte técnico</option>
+                        <option value="Ventas">Ventas</option>
+                        <option value="Asociación comercial">Asociación comercial</option>
+                        <option value="Otro">Otro</option>
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Mensaje"
+                        multiline
+                        rows={4}
+                        value={leadForm.message}
+                        onChange={handleInputChange('message')}
+                        disabled={isSubmitting}
+                        placeholder="Escribe tu mensaje aquí..."
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                              <Message sx={{ color: drokexColors.primary }} />
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2,
+                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                              borderColor: drokexColors.primary,
+                            }
+                          }
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+                    <DrokexButton
+                      type="submit"
+                      variant="primary"
+                      size="large"
+                      loading={isSubmitting}
+                      sx={{
+                        py: 1.5,
+                        fontSize: '1rem',
+                        borderRadius: 2,
+                        backgroundColor: drokexColors.primary,
+                        color: 'white',
+                        width: '33%',
+                        '&:hover': {
+                          backgroundColor: drokexColors.secondary,
+                        }
+                      }}
+                    >
+                      Enviar mensaje
+                    </DrokexButton>
+                  </Box>
                 </Box>
               </Box>
-            </DrokexCardContent>
-            </DrokexCard>
-          </BitsReveal>
+            </Grid>
+
+            {/* Información de Contacto - Lado Derecho */}
+            <Grid item xs={12} lg={6}>
+              <Box sx={{ position: 'relative', height: '100%',padding: '32px',
+                  borderRadius: '24px',
+                  boxShadow: '0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 1px 8px 0px rgba(0, 0, 0, 0.12)', }}>
+                {/* Información de Contacto */}
+                <Box sx={{ mb: 6 }}>
+                  <Typography variant="h5" sx={{ mb: 4, color: drokexColors.dark, fontWeight: 400 }}>
+                    Contáctanos con telefono
+                  </Typography>
+
+                  <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Phone sx={{ color: drokexColors.primary, fontSize: 24 }} />
+                    <Typography variant="h6" sx={{ color: drokexColors.dark }}>
+                     +57 311 531 2623
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Email sx={{ color: drokexColors.primary, fontSize: 24 }} />
+                    <Typography variant="h6" sx={{ color: drokexColors.dark }}>
+                      contacto@drokex.com
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <LocationOn sx={{ color: drokexColors.primary, fontSize: 24 }} />
+                    <Box>
+                      <Typography variant="h6" sx={{ color: drokexColors.dark }}>
+                        Avenida carrera 28 #34-43
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: drokexColors.dark }}>
+                        Bogotá, Colombia
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                
+              </Box>
+            </Grid>
+
+            {/* Robot Drokex - Imagen Real */}
+            <Box sx={{
+              position: 'absolute',
+              right: -200,
+              top: 0,
+              bottom: 0,
+              zIndex: 10,
+              display: { xs: 'none', lg: 'flex' },
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              width: '40%',
+              pointerEvents: 'none'
+            }}>
+                  <Box
+                    component="img"
+                    src="/assets/drokex-robot-contacto.png"
+                    alt="Robot Drokex - Contacto"
+                    sx={{
+                      height: '100%',
+                      width: 'auto',
+                      minHeight: '400px',
+                      objectFit: 'contain',
+                      objectPosition: 'bottom center',
+                      filter: 'brightness(1.05) contrast(1.2) saturate(1.1) drop-shadow(0 15px 35px rgba(0,0,0,0.15))',
+                      opacity: 0.9,
+                      mixBlendMode: 'darken',
+                      transition: 'all 0.3s ease',
+                      maskImage: 'linear-gradient(to top, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.8) 60%, rgba(255,255,255,1) 100%)',
+                      WebkitMaskImage: 'linear-gradient(to top, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.8) 60%, rgba(255,255,255,1) 100%)',
+                      '&:hover': {
+                        transform: 'scale(1.02)',
+                        opacity: 0.95
+                      }
+                    }}
+                    onError={(e) => {
+                      // Fallback si no se encuentra la imagen
+                      console.log('No se pudo cargar la imagen del robot');
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+
+                  {/* Efecto de brillo sutil */}
+                  <Box sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: `radial-gradient(circle at 30% 30%, ${drokexColors.primary}15 0%, transparent 60%)`,
+                    borderRadius: '50%',
+                    animation: 'subtleGlow 4s ease-in-out infinite',
+                    pointerEvents: 'none'
+                  }} />
+
+                  {/* Estilos de animación sutil */}
+                  <style>
+                    {`
+                      @keyframes subtleGlow {
+                        0%, 100% { opacity: 0.3; transform: scale(1); }
+                        50% { opacity: 0.6; transform: scale(1.02); }
+                      }
+                    `}
+                  </style>
+            </Box>
+          </Grid>
         </Container>
-      </DrokexPattern>
+      </Box>
 
       <PublicFooter />
     </Box>
