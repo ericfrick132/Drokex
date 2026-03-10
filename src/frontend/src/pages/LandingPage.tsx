@@ -99,19 +99,22 @@ const HeroRobotTransition: React.FC<HeroRobotTransitionProps> = ({ isProvider })
             opacity: 0,
             x: isProvider ? 20 : -20,
             filter: 'blur(8px)',
-            scale: 0.7
+            scale: 0.7,
+            rotateY: isProvider ? 90 : -90
           }}
           animate={{
             opacity: 1,
             x: 0,
             filter: 'blur(0px)',
-            scale: 1
+            scale: 1,
+            rotateY: 0
           }}
           exit={{
             opacity: 0,
             x: isProvider ? -20 : 20,
             filter: 'blur(8px)',
-            scale: 0.7
+            scale: 0.7,
+            rotateY: isProvider ? -90 : 90
           }}
           transition={{
             duration: 0.25,

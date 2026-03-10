@@ -191,20 +191,50 @@ const ProviderDashboard: React.FC = () => {
       </Box>
 
       {/* Estadísticas */}
-      <Grid container spacing={3} mb={4}>
-        {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <StatCard
-              title={stat.title}
-              value={stat.value}
-              subtitle={stat.subtitle}
-              icon={stat.icon}
-              color={stat.color}
-              trend={stat.trend}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      <Box sx={{ position: 'relative', mb: 4 }}>
+        <Grid container spacing={3}>
+          {stats.map((stat, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index}>
+              <StatCard
+                title={stat.title}
+                value={stat.value}
+                subtitle={stat.subtitle}
+                icon={stat.icon}
+                color={stat.color}
+                trend={stat.trend}
+              />
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Robot Señalador superpuesto debajo del card Revenue Estimado */}
+        <Box sx={{
+          position: 'absolute',
+          top: '100%',
+          right: { xs: '10px', md: '-4rem' },
+          width: { xs: '200px', md: '300px' },
+          height: { xs: '200px', md: '500px' },
+          backgroundImage: 'url(/assets/robot-senalador.png)',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center bottom',
+          zIndex: 10,
+          pointerEvents: 'none',
+          filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.15))',
+          transform: 'translateY(-20px)',
+          opacity: 0.9,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '40%',
+            background: 'linear-gradient(to top, rgba(255, 255, 255, 0.5) 20%, rgba(255, 255, 255, 0.5) 70%, transparent 100%)',
+            pointerEvents: 'none'
+          }
+        }} />
+      </Box>
 
       {/* Contenido principal */}
       <Grid container spacing={3}>

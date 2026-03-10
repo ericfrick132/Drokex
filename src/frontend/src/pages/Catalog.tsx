@@ -100,26 +100,88 @@ const Catalog: React.FC = () => {
   };
 
   return (
-    <DrokexPattern pattern="diagonal" opacity={0.02}>
-      <Box sx={{ minHeight: '100vh', backgroundColor: drokexColors.light }}>
-        <PublicNavbar />
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Typography variant="h4" sx={{ color: drokexColors.dark, fontWeight: 700, mb: 2 }}>
+    <Box sx={{ minHeight: '100vh', backgroundColor: drokexColors.light }}>
+      <PublicNavbar />
+
+      {/* Header Section with Background Image */}
+      <Box sx={{
+        minHeight: '65vh',
+        backgroundImage: 'url(/assets/catalogo_fondo_2.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.2)',
+          zIndex: 1
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '40%',
+          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.4) 25%, rgba(0, 0, 0, 0.2) 50%, transparent 100%)',
+          zIndex: 1
+        }
+      }}>
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              color: '#c3e6c1',
+              fontWeight: 700,
+              mb: 4,
+              textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              fontSize: { xs: '2rem', md: '3rem' }
+            }}
+          >
             Catálogo de Productos
           </Typography>
 
-          <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid item xs={12} md={6}>
+          <Grid container spacing={2} sx={{ maxWidth: '800px' }}>
+            <Grid item xs={12} md={8}>
               <TextField
                 fullWidth
                 placeholder="Buscar productos, empresas..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={onSearchEnter}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    borderRadius: 3,
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    '&:hover': {
+                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
+                    },
+                    borderColor: 'rgba(105, 223, 97, 1)',
+                    '&.Mui-focused': {
+                      backgroundColor: 'rgba(255, 255, 255, 1)',
+                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
+                    }
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  }
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => setPage(1)}>
+                      <IconButton onClick={() => setPage(1)} sx={{ color: drokexColors.primary }}>
                         <Search />
                       </IconButton>
                     </InputAdornment>
@@ -127,16 +189,35 @@ const Catalog: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <FormControl fullWidth>
-                <InputLabel id="cat-label">Categoría</InputLabel>
                 <Select
-                  labelId="cat-label"
-                  label="Categoría"
                   value={categoryId}
                   onChange={(e) => { setCategoryId(e.target.value as any); setPage(1); }}
+                  displayEmpty
+                  sx={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(10px)',
+                    WebkitBackdropFilter: 'blur(10px)',
+                    borderRadius: 3,
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                    borderColor: 'rgba(105, 223, 97, 1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    '&:hover': {
+                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'rgba(255, 255, 255, 1)',
+                      boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    }
+                  }}
                 >
-                  <MenuItem value="">Todas</MenuItem>
+                  <MenuItem value="" sx={{ color: drokexColors.secondary }}>
+                    Categoría
+                  </MenuItem>
                   {categories.map(c => (
                     <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
                   ))}
@@ -144,6 +225,12 @@ const Catalog: React.FC = () => {
               </FormControl>
             </Grid>
           </Grid>
+        </Container>
+      </Box>
+
+      {/* Products Section */}
+      <DrokexPattern pattern="diagonal" opacity={0.02}>
+        <Container maxWidth="lg" sx={{ py: 4 }}>
 
           <Grid container spacing={3}>
             {products.map((p) => (
@@ -164,9 +251,10 @@ const Catalog: React.FC = () => {
             <Pagination count={totalPages} page={page} onChange={(_, p) => setPage(p)} color="primary" />
           </Box>
         </Container>
-        <PublicFooter />
-      </Box>
-    </DrokexPattern>
+      </DrokexPattern>
+
+      <PublicFooter />
+    </Box>
   );
 };
 
